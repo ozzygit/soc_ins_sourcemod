@@ -1,6 +1,6 @@
 #define PLUGIN_DESCRIPTION "Provides functions to support Insurgency. Includes logging, round statistics, weapon names, player class names, and more."
 #define PLUGIN_NAME "[INS] Insurgency Support Library"
-#define PLUGIN_VERSION "1.4.29"
+#define PLUGIN_VERSION "1.4.3"
 #define PLUGIN_WORKING "1"
 #define PLUGIN_LOG_PREFIX "INSLIB"
 #define PLUGIN_AUTHOR "Jared Ballou (jballou)"
@@ -483,94 +483,9 @@ reset_round_stats_all()
 		reset_round_stats(i);
 	}
 }
-
 // Get weapon id of a given weapon entity
-//	if(client > 0 && IsClientInGame(client))
-GetWeaponId(i) 
-{
-    if (i < 0) 
-    {
-        return -1;
-    }
-    
-    new m_hWeaponDefinitionHandle;
-    if (HasEntProp(i, Prop_Send, "m_hWeaponDefinitionHandle"))
-    {
-        m_hWeaponDefinitionHandle = GetEntProp(i, Prop_Send, "m_hWeaponDefinitionHandle");
-    }
-    new String:name[32];
-    GetEdictClassname(i, name, sizeof(name));
-    decl String:strBuf[32];
-    GetArrayString(g_weap_array, m_hWeaponDefinitionHandle, strBuf, sizeof(strBuf));
-    if (i > 0 && i <=MaxClients &&
-    m_hWeaponDefinitionHandle &&
-    IsClientInGame(i) &&
-    IsPlayerAlive(i) &&
-    !IsFakeClient(i))
-    if(!StrEqual(name, strBuf)) 
-    {
-        SetArrayString(g_weap_array, m_hWeaponDefinitionHandle, name);
-        InsLog(DEBUG,"Weapon %s not in trie, added as index %d", name,m_hWeaponDefinitionHandle);
-    }
-    return m_hWeaponDefinitionHandle;
-}
-
-//to be tested
-
-/*
-int GetWeaponId(int entity) {
-    if (!IsValidEntity(entity) || !HasEntProp(entity, Prop_Send, "m_hWeaponDefinitionHandle")) {
-        return -1;
-    }
-    
-    char sClassname[32]; 
-    char sWeaponName[32];
-    
-    int m_hWeaponDefinitionHandle = GetEntProp(entity, Prop_Send, "m_hWeaponDefinitionHandle");
-    
-    GetArrayString(g_weap_array, m_hWeaponDefinitionHandle, sWeaponName, sizeof(sWeaponName));
-    GetEntityClassname(entity, sClassname, sizeof(sClassname));
-    
-    if(!StrEqual(sClassname, sWeaponName)) {
-        SetArrayString(g_weap_array, m_hWeaponDefinitionHandle, sClassname);
-        InsLog(DEBUG,"Weapon %s not in trie, added as index %d", sClassname, m_hWeaponDefinitionHandle);
-    }
-    
-    return m_hWeaponDefinitionHandle;
-}
-*/
-
-
-/*
 GetWeaponId(i) {
-    if (!IsValidEntity(i) || !HasEntProp(i, Prop_Send, "m_hWeaponDefinitionHandle")) {
-        return -1;
-    }
-    
-    char sClassname[32]; 
-    char sWeaponName[32];
-    
-    int m_hWeaponDefinitionHandle = GetEntProp(i, Prop_Send, "m_hWeaponDefinitionHandle");
-    
-    GetArrayString(g_weap_array, m_hWeaponDefinitionHandle, sWeaponName, sizeof(sWeaponName));
-    GetEntityClassname(i, sClassname, sizeof(sClassname));
-    
-    if(!StrEqual(sClassname, sWeaponName)) {
-        SetArrayString(g_weap_array, m_hWeaponDefinitionHandle, sClassname);
-        InsLog(DEBUG,"Weapon %s not in trie, added as index %d", sClassname, m_hWeaponDefinitionHandle);
-    }
-    
-    return m_hWeaponDefinitionHandle;
-}
-*/
-
-
-//old code
-/*
-GetWeaponId(i) 
-{
-	if (i < 0) 
-	{
+	if (i < 0) {
 		return -1;
 	}
 	new m_hWeaponDefinitionHandle = GetEntProp(i, Prop_Send, "m_hWeaponDefinitionHandle");
@@ -578,14 +493,13 @@ GetWeaponId(i)
 	GetEdictClassname(i, name, sizeof(name));
 	decl String:strBuf[32];
 	GetArrayString(g_weap_array, m_hWeaponDefinitionHandle, strBuf, sizeof(strBuf));
-	if(!StrEqual(name, strBuf)) 
-	{
+	if(!StrEqual(name, strBuf)) {
 		SetArrayString(g_weap_array, m_hWeaponDefinitionHandle, name);
 		InsLog(DEBUG,"Weapon %s not in trie, added as index %d", name,m_hWeaponDefinitionHandle);
 	}
 	return m_hWeaponDefinitionHandle;
 }
-*/
+
 dump_player_stats(client)
 {
 	if (IsClientInGame(client) && IsClientConnected(client))

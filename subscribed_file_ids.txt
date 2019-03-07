@@ -1,0 +1,95 @@
+// THEATERS
+
+
+//497805503 //dy_theater_v1_5_1_5-8_1039_mw2
+//1107259227 //ozzy theater - 16p medics
+//1497661951 //ozzy theater - 10p medics
+1498542862 //ozzy theater - 10 player medics
+
+//CUSTOM
+1110283951 //ozzy assets
+//655202529 //dy_material_mods
+//508986302 // Sernix Assets
+1093448189 //insurgent arabic voices
+761565999 //hd pistol suppressor
+501453482 //Weapons Cache Explosion Sound Upgrade by ChrømeLightsaber  
+
+//MAP SCREENS
+530079601 //Extream's vote screen v84
+342964725 //daimyo_ins_map_screens
+660049434 //FRS Vote Screen Maps
+560251142 //magni1200s's Screen Maps
+1433331025 //oz map vote screenshots
+1432912836 //LeiMuu Vote Screen for Cooperation mode Map Collection
+
+// MAPS
+400214755 //Abdallah
+426712960 //Almaden
+498253639 //amber_spirits_coop
+352148389 //angle_iron_coop_ws
+532461305 //badlands_b1
+1093292666 //Baghdad
+607285980 //bb river coop
+318205420 //block_party_coop_ws
+616494611 //bridge_coop_optimized_v1
+498255733 //clean_sweep_coop_ws
+797028573 //congress_coop
+621451355 //depot_coop
+//599730897 //dust2_checkpoint - crashes server
+283122727 //dusty_anguish_coopv1_1
+//650616844 //Estates_b4 - lag/crash?
+498257082 //fortress_coop_ws
+784586558 //frequency_coop
+352149578 //game_day_coop_ws
+//447480972 //gizab_b1_coop - unpopular
+399587465 //haditha_ws
+//511253610 //Health Center Co-op 2.0 - texture issues 
+574334931 //Hurtlocker_coopv2hc
+603342622 //inferno_checkpoint
+498252536 //invasion_coop_ws
+283125289 //jack_hammer_coopv1_2
+292080383 //jail_break_coop_ws
+426742049 //Karkar
+383525894 //khanashin_b8
+292081732 //launch_control_coop_ws
+795846849 //mountain_lake_coopv1_1
+523594320 //osama_b3_checkpoint
+573278223 //Panama Canal
+//645198093 //payback - kicks players
+1393527442 //Point Blank Fix
+//1104499 //Prospect COOP - Dark Map
+1388556079 //ps7
+440046323 //SHELLSHOCK - console errors spammed
+//1401524373 //SHELLSHOCK my  test upload
+523648618 //takbar_b5
+576037848 //tet
+346843105 //the_burbs_coop
+492051918 //the_raid_coop_ws
+284971476 //tunnel_rats_coop_ws
+619928531 //Winter Rescue
+517972533 //zagros_convoy_b5
+1207457291 //cs_italy_coop
+//1264090927 //l4d_airport_terminal_b3
+//1180002850 //nomercy_coopv1
+1388153004 //cs_officeb3_coop_v1_5
+1304334030 //block26_b1
+1408800189 //c7m1_docks
+1388605114 //central_coop_final
+1388547184 //ikazuchi_jungle_coop_b3
+1388155777 //dedust1p2_coop
+1388124831 //bb_maya_beta5
+1172671775 //warehouse_coopv3b4
+1126512454 //convoy_coopv1
+815189600 //cs_workout_v1
+1189448765 //miransh_alpha
+1482148634 //facilityb2_coop_v1_1
+1479939653 //pipeline_coop 
+1457936959 //bastion_coop
+1469832785 //cs_office_coop_b2
+1501650494 //Docks_coopb2_day
+1501827880 //l4d_ga_b2_day
+1502325909 //l4d_garage_lots_day
+1500855044 //l4d_ag_b1
+822609478 //ins_bridgeatremagen_coop
+1489324292 //karkar_b10
+939873335 //shop_invasion_coop_b2
