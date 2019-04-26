@@ -44,12 +44,13 @@
 
 
 *****************************************************************/
+
 new Handle:hTopMenu = INVALID_HANDLE;
 new String:g_fileset[128];
 new String:g_filesettings[128];
 new bool:g_UseGeoIPCity = false;
-
 new Handle:g_CvarConnectDisplayType = INVALID_HANDLE;
+
 /*****************************************************************
 
 
@@ -57,11 +58,11 @@ new Handle:g_CvarConnectDisplayType = INVALID_HANDLE;
 
 
 *****************************************************************/
+
 #include "cannounce/countryshow.sp"
 #include "cannounce/joinmsg.sp"
 #include "cannounce/geolist.sp"
 #include "cannounce/suppress.sp"
-
 
 /*****************************************************************
 
@@ -70,6 +71,7 @@ new Handle:g_CvarConnectDisplayType = INVALID_HANDLE;
 
 
 *****************************************************************/
+
 public Plugin:myinfo =
 {
 	name = "Connect Announce",
@@ -134,11 +136,9 @@ public OnMapStart()
 {
 	//get, precache and set downloads for player custom sound files
 	LoadSoundFilesCustomPlayer();
-		
+
 	//precahce and set downloads for sounds files for all players
 	LoadSoundFilesAll();
-	
-	
 	OnMapStart_JoinMsg();
 }
 
@@ -149,7 +149,6 @@ public OnClientAuthorized(client, const String:auth[])
 		if( !IsFakeClient(client) && GetClientCount(true) < MaxClients )
 		{
 			OnPostAdminCheck_CountryShow(client);
-		
 			OnPostAdminCheck_JoinMsg(auth);
 		}
 	}
@@ -166,7 +165,6 @@ public OnClientPostAdminCheck(client)
 		if( !IsFakeClient(client) && GetClientCount(true) < MaxClients )
 		{
 			OnPostAdminCheck_CountryShow(client);
-		
 			OnPostAdminCheck_JoinMsg(auth);
 		}
 	}	
@@ -175,7 +173,6 @@ public OnClientPostAdminCheck(client)
 public OnPluginEnd()
 {		
 	OnPluginEnd_JoinMsg();
-	
 	OnPluginEnd_CountryShow();
 }
 
@@ -190,8 +187,6 @@ public OnAdminMenuReady(Handle:topmenu)
 	
 	//Save the Handle
 	hTopMenu = topmenu;
-	
-	
 	OnAdminMenuReady_JoinMsg();	
 }
 
@@ -235,8 +230,6 @@ public Action:event_PlayerDisconnect(Handle:event, const String:name[], bool:don
 		
 		OnClientDisconnect_JoinMsg();
 	}
-	
-	
 	return event_PlayerDisconnect_Suppress( event, name, dontBroadcast );
 }
 
@@ -249,6 +242,7 @@ public Action:event_PlayerDisconnect(Handle:event, const String:name[], bool:don
 
 *****************************************************************/
 //Thanks to Darkthrone (https://forums.alliedmods.net/member.php?u=54636)
+
 bool:IsLanIP( String:src[16] )
 {
 	decl String:ip4[4][4];
@@ -272,16 +266,13 @@ PrintFormattedMessageToAll( String:rawmsg[301], client )
 	decl String:message[301];
 	
 	GetFormattedMessage( rawmsg, client, message, sizeof(message) );
-	
 	CPrintToChatAll( "%s", message );
 }
 
 PrintFormattedMessageToAdmins( String:rawmsg[301], client )
 {
 	decl String:message[301];
-	
-	GetFormattedMessage( rawmsg, client, message, sizeof(message) );
-	
+	GetFormattedMessage( rawmsg, client, message, sizeof(message) );	
 	for (new i = 1; i <= GetMaxClients(); i++)
 	{
 		if( IsClientInGame(i) && CheckCommandAccess( i, "", ADMFLAG_GENERIC, true ) )
@@ -294,9 +285,7 @@ PrintFormattedMessageToAdmins( String:rawmsg[301], client )
 PrintFormattedMsgToNonAdmins( String:rawmsg[301], client )
 {
 	decl String:message[301];
-	
 	GetFormattedMessage( rawmsg, client, message, sizeof(message) );
-	
 	for (new i = 1; i <= GetMaxClients(); i++)
 	{
 		if( IsClientInGame(i) && !CheckCommandAccess( i, "", ADMFLAG_GENERIC, true ) )
@@ -319,9 +308,7 @@ GetFormattedMessage( String:rawmsg[301], client, String:outbuffer[], outbuffersi
 	decl String:sPlayerAdmin[32];
 	decl String:sPlayerPublic[32];
 	new bool:bIsLanIp;
-	
 	decl AdminId:aid;
-	
 	if( client > -1 )
 	{
 		GetClientIP(client, ip, sizeof(ip)); 
@@ -398,22 +385,18 @@ GetFormattedMessage( String:rawmsg[301], client, String:outbuffer[], outbuffersi
 		{
 			Format( city, sizeof(city), "%T", "Unknown City Desc", LANG_SERVER );
 		}
-		
 		if( StrEqual( region, "" ) )
 		{
 			Format( region, sizeof(region), "%T", "Unknown Region Desc", LANG_SERVER );
 		}
-		
 		if( StrEqual( country, "" ) )
 		{
 			Format( country, sizeof(country), "%T", "Unknown Country Desc", LANG_SERVER );
 		}
-		
 		if( StrEqual( ccode, "" ) )
 		{
 			Format( ccode, sizeof(ccode), "%T", "Unknown Country Short", LANG_SERVER );
 		}
-		
 		if( StrEqual( ccode3, "" ) )
 		{
 			Format( ccode3, sizeof(ccode3), "%T", "Unknown Country Short 3", LANG_SERVER );
