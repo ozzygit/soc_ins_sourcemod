@@ -27,16 +27,16 @@ Bot will show up in your discord server and you will have to give the permission
 FULL credit goes to Circleus for the development of the plugin and his support to Ozzy. Credit goes to MERZBAU with getting the RCON timeout issue fixed.
 */
 
-
 //Discord
 var Discord = require("discord.js");
 var bot = new Discord.Client();
 
 //Rcon
 var Rcon = require("rcon");
-var rconConnection = new Rcon('IP here', port, 'rcon_password here');
-//Example: new Rcon('192.168.1.256', 27015, 'killyouall123');
-
+// Define your serverip, port and rcon password below
+var rconConnection = new Rcon('serverip', serverport, 'rconpass');
+var max_timeout = 30000; // this is in ms
+var last_command = new Date;
 
 console.log("[SERVER] Server started");
 
@@ -88,10 +88,31 @@ bot.on("message", msg => {
 	
 	//After it passed all the check we send a rcon message to the in-game server
 	//In-game server will print out to all chat using that cvar
-	rconConnection.send('discordchat ' + username + ' : ' + message);
-	
+
+	var current_time = new Date;
+	if ((current_time % last_command) > max_timeout) {
+		rconConnection.disconnect();
+// Define your serverip, port and rcon password below
+		rconConnection = new Rcon('serverip', serverport, 'rconpass');
+		rconConnection.on('auth', function() {
+		        console.log("[RCON] Re-Authed!");
+		        rconConnection.send('discordchat ' + username + ' : ' + message);
+		}).on('response', function(str) {
+		        console.log("[RCON] Response: " + str);
+		}).on('end', function() {
+		        console.log("[RCON] Socket closed!");
+		});
+
+		rconConnection.connect();
+	}
+	else {
+	      rconConnection.send('discordchat ' + username + ' : ' + message);
+	}
+
+	last_command = new Date;
 	console.log('[INS-DISCORD] ' + username + ' : ' + message)
 });
 
 //Discord bot token (Require you to create your own discord bot in https://discordapp.com/developers/applications/)
-bot.login("Your bot token here");
+//Replace bottoken below with your discord bot token
+bot.login("bottoken");
