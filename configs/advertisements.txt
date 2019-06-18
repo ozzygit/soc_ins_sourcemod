@@ -37,9 +37,4 @@
 		"type"		"S"
 		"text"		"{GREEN}Please join us on Steam at https://steamcommunity.com/groups/ozzyau"
 	}
-	"4"
-	{
-		"type"		"S"
-		"text"		"{GREEN}Contact {DEFAULT}Ozzy {GREEN}rmooreau@outlook.com"
-	}
 }
