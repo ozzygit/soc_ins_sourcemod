@@ -42,7 +42,6 @@
 #define Gren_RPG7 61
 #define Revive_Indicator_Radius	100.0
 
-
 // This will be used for checking which team the player is on before repsawning them
 #define SPECTATOR_TEAM	0
 #define TEAM_SPEC 	1
@@ -55,6 +54,9 @@
 #define MIN_PLAYER_DISTANCE 128.0
 #define MAX_ENTITIES 2048
 
+#define MAX_LINE_WIDTH 60
+#define PLUGIN_VERSION "4.4"
+
 // Counter-Attack Music
 #define COUNTER_ATTACK_MUSIC_DURATION 68.0
 
@@ -62,124 +64,238 @@
 #define YELLOW 0x01
 #define GREEN 0x04
 
-// SOME DEFINES
-#define MAX_LINE_WIDTH 60
+// STATS TIME (SET DAYS AFTER STATS ARE DELETE OF NONACTIVE PLAYERS)
+#define PLAYER_STATSOLD 30
+
+#define PLUGIN_DESCRIPTION "Respawn dead players via admincommand or by queues"
+#define UPDATE_URL	"http://ins.jballou.com/sourcemod/update-respawn.txt"
 
 // Handle for revive
-Handle g_hForceRespawn;
-Handle g_hGameConfig;
+Handle 	g_hForceRespawn,
+		g_hGameConfig;
 
-int g_iBeaconBeam;
-int g_iBeaconHalo;
+// Init global variables
+int g_iCvar_respawn_enable,
+	g_elite_counter_attacks,
+	g_finale_counter_spec_enabled,
+	g_finale_counter_spec_percent,
+	g_iCvar_revive_enable,
+	g_counterAttack_min_dur_sec,
+	g_counterAttack_max_dur_sec,
+	g_iCvar_respawn_type_team_ins,
+	g_iCvar_respawn_type_team_sec,
+	g_iCvar_respawn_reset_type,
+	g_iCvar_enable_track_ammo,
+	g_iCvar_counterattack_type,
+	g_iCvar_counterattack_vanilla,
+	g_iCvar_final_counterattack_type;
+float g_fCvar_respawn_delay_team_ins,
+	g_respawn_counter_chance,
+	g_fCvar_respawn_delay_team_ins_spec;
+
+
+//Dynamic Respawn cvars
+int g_DynamicRespawn_Distance_mult,
+	g_dynamicSpawnCounter_Perc,
+	g_dynamicSpawn_Perc;
+
+// Fatal dead
+float g_fCvar_fatal_chance,
+	g_fCvar_fatal_head_chance;
+int g_iCvar_fatal_limb_dmg,
+	g_iCvar_fatal_head_dmg,
+	g_iCvar_fatal_burn_dmg,
+	g_iCvar_fatal_explosive_dmg,
+	g_iCvar_fatal_chest_stomach,
+
+//Respawn Mode (wave based)
+	g_respawn_mode_team_sec,
+	g_cacheObjActive = 0,
+	g_checkStaticAmt,
+	g_checkStaticAmtCntr,
+	//g_checkStaticAmtAway,
+	//g_checkStaticAmtCntrAway,
+	g_iReinforceTime,
+	g_iReinforceTime_AD_Temp,
+	g_iReinforceTimeSubsequent_AD_Temp,
+	g_iReinforce_Mult,
+	g_iReinforce_Mult_Base,
+	g_iRemaining_lives_team_sec,
+	g_iRemaining_lives_team_ins,
+	g_iRespawn_lives_team_sec,
+	g_iRespawn_lives_team_ins,
+	g_iRespawnSeconds,
+	g_secWave_Timer,
+	g_iHeal_amount_paddles,
+	g_iHeal_amount_medPack,
+	g_nonMedicHeal_amount,
+	g_nonMedicRevive_hp,
+	g_minorWoundRevive_hp,
+	g_modWoundRevive_hp,
+	g_critWoundRevive_hp,
+	g_minorWound_dmg,
+	g_moderateWound_dmg,
+	g_medicHealSelf_max,
+	g_nonMedicHealSelf_max,
+	g_nonMedic_maxHealOther,
+	g_minorRevive_time,
+	g_modRevive_time,
+	g_critRevive_time,
+	g_nonMedRevive_time,
+	g_botsReady,
+	g_isCheckpoint;
+float g_flMinPlayerDistance,
+	g_flBackSpawnIncrease,
+	g_flMaxPlayerDistance,
+	g_flCanSeeVectorMultiplier,
+	g_flMinObjectiveDistance,
+	g_flSpawnAttackDelay;
+
+//Elite bots Counters
+int	g_ins_bot_count_checkpoint_max_org,
+	g_mp_player_resupply_coop_delay_max_org,
+	g_mp_player_resupply_coop_delay_penalty_org,
+	g_mp_player_resupply_coop_delay_base_org,
+	g_bot_attack_aimpenalty_amt_close_org,
+	g_bot_attack_aimpenalty_amt_far_org,
+	g_bot_attack_aimpenalty_amt_close_mult,
+	g_bot_attack_aimpenalty_amt_far_mult,
+	g_coop_delay_penalty_base,
+	g_isEliteCounter,
+	m_hMyWeapons,
+	m_flNextPrimaryAttack,
+	m_flNextSecondaryAttack;
+ float g_bot_attack_aimpenalty_time_close_org,
+	 g_bot_attack_aimpenalty_time_far_org,
+	 g_bot_aim_aimtracking_base_org,
+	 g_bot_aim_aimtracking_frac_impossible_org,
+	 g_bot_aim_angularvelocity_frac_impossible_org,
+	 g_bot_aim_angularvelocity_frac_sprinting_target_org,
+	 g_bot_aim_attack_aimtolerance_frac_impossible_org,
+	 g_bot_attackdelay_frac_difficulty_impossible_org,
+	 g_bot_attack_aimtolerance_newthreat_amt_org,
+	 g_bot_attack_aimtolerance_newthreat_amt_mult,
+	 g_bot_attackdelay_frac_difficulty_impossible_mult,
+	 g_bot_attack_aimpenalty_time_close_mult,
+	 g_bot_attack_aimpenalty_time_far_mult,
+	 g_bot_aim_aimtracking_base,
+	 g_bot_aim_aimtracking_frac_impossible,
+	 g_bot_aim_angularvelocity_frac_impossible,
+	 g_bot_aim_angularvelocity_frac_sprinting_target,
+	 g_bot_aim_attack_aimtolerance_frac_impossible;
+
+
+
+// STATS DEFINATION FOR PLAYERS
+int g_iStatKills[MAXPLAYERS+1],
+	g_iStatDeaths[MAXPLAYERS+1],
+	g_iStatHeadShots[MAXPLAYERS+1],
+	g_iStatSuicides[MAXPLAYERS+1],
+	g_iStatRevives[MAXPLAYERS+1],
+	g_iStatHeals[MAXPLAYERS+1];
+
+int g_iBeaconBeam,
+	g_iBeaconHalo;
 
 // AI Director Variables
-int g_AIDir_TeamStatus = 50;
-int g_AIDir_TeamStatus_min = 0;
-int g_AIDir_TeamStatus_max = 100;
-int g_AIDir_BotsKilledReq_mult = 4;
-int g_AIDir_BotsKilledCount = 0;
-int g_AIDir_AnnounceCounter = 0;
-	//g_AIDir_AnnounceTrig = 5,
-int g_AIDir_ChangeCond_Counter = 0;
-int g_AIDir_ChangeCond_Min = 60;
-int g_AIDir_ChangeCond_Max = 180;
-int g_AIDir_AmbushCond_Counter = 0;
-int g_AIDir_AmbushCond_Min = 120;
-int g_AIDir_AmbushCond_Max = 300;
-int g_AIDir_AmbushCond_Rand = 240;
-int g_AIDir_AmbushCond_Chance = 10;
-int g_AIDir_ChangeCond_Rand = 180;
-int g_AIDir_ReinforceTimer_Orig;
-int g_AIDir_ReinforceTimer_SubOrig;
-	//g_AIDir_CurrDiff = 0,
-int g_AIDir_DiffChanceBase = 0;
-bool g_AIDir_BotReinforceTriggered = false;
+int g_AIDir_TeamStatus = 50,
+	g_AIDir_TeamStatus_min = 0,
+	g_AIDir_TeamStatus_max = 100,
+	g_AIDir_BotsKilledReq_mult = 4,
+	g_AIDir_BotsKilledCount = 0,
+	g_AIDir_AnnounceCounter = 0,
+	g_AIDir_ChangeCond_Counter = 0,
+	g_AIDir_ChangeCond_Min = 60,
+	g_AIDir_ChangeCond_Max = 180,
+	g_AIDir_AmbushCond_Counter = 0,
+	g_AIDir_AmbushCond_Min = 120,
+	g_AIDir_AmbushCond_Max = 300,
+	g_AIDir_AmbushCond_Rand = 240,
+	g_AIDir_AmbushCond_Chance = 10,
+	g_AIDir_ChangeCond_Rand = 180,
+	g_AIDir_ReinforceTimer_Orig,
+	g_AIDir_ReinforceTimer_SubOrig,
+	g_AIDir_DiffChanceBase = 0;
+bool g_AIDir_BotReinforceTriggered = false,
 
 // Player respawn
-int g_iEnableRevive = 0;
-int g_GiveBonusLives = 0;
-int g_iRespawnTimeRemaining[MAXPLAYERS+1];
-int g_iReviveRemainingTime[MAXPLAYERS+1];
-int g_iReviveNonMedicRemainingTime[MAXPLAYERS+1];
-int g_iPlayerRespawnTimerActive[MAXPLAYERS+1];
-int g_iSpawnTokens[MAXPLAYERS+1];
-int g_iHurtFatal[MAXPLAYERS+1];
-int g_iClientRagdolls[MAXPLAYERS+1];
-int g_iNearestBody[MAXPLAYERS+1];
-int g_botStaticGlobal[MAXPLAYERS+1];
-int g_resupplyCounter[MAXPLAYERS+1];
-int g_trackKillDeaths[MAXPLAYERS+1];
-float g_badSpawnPos_Track[MAXPLAYERS+1][3];
-int g_iRespawnCount[4];
-bool g_playersReady = false;
-int g_removeBotGrenadeChance = 50;
-float g_fDeadPosition[MAXPLAYERS+1][3];
-float g_fRagdollPosition[MAXPLAYERS+1][3];
-float g_vecOrigin[MAXPLAYERS+1][3];
-int g_iPlayerBGroups[MAXPLAYERS+1];
-int g_spawnFrandom[MAXPLAYERS+1];
-int g_squadSpawnEnabled[MAXPLAYERS+1] = 0;
-int g_squadLeader[MAXPLAYERS+1];
-int g_LastButtons[MAXPLAYERS+1];
-float g_fRespawnPosition[3];
+	g_playersReady = false;
+float g_fRespawnPosition[3],
+	g_badSpawnPos_Track[MAXPLAYERS+1][3],
+	g_fDeadPosition[MAXPLAYERS+1][3],
+	g_fRagdollPosition[MAXPLAYERS+1][3],
+	g_vecOrigin[MAXPLAYERS+1][3];
+int g_iEnableRevive = 0,
+	g_GiveBonusLives = 0,
+	g_iRespawnTimeRemaining[MAXPLAYERS+1],
+	g_iReviveRemainingTime[MAXPLAYERS+1],
+	g_iReviveNonMedicRemainingTime[MAXPLAYERS+1],
+	g_iPlayerRespawnTimerActive[MAXPLAYERS+1],
+	g_iSpawnTokens[MAXPLAYERS+1],
+	g_iHurtFatal[MAXPLAYERS+1],
+	g_iClientRagdolls[MAXPLAYERS+1],
+	g_iNearestBody[MAXPLAYERS+1],
+	g_botStaticGlobal[MAXPLAYERS+1],
+	g_resupplyCounter[MAXPLAYERS+1],
+	g_trackKillDeaths[MAXPLAYERS+1],
+	g_iRespawnCount[4],
+	g_removeBotGrenadeChance = 50,
+	g_iPlayerBGroups[MAXPLAYERS+1],
+	g_spawnFrandom[MAXPLAYERS+1],
+	g_squadSpawnEnabled[MAXPLAYERS+1] = 0,
+	g_squadLeader[MAXPLAYERS+1],
+	g_LastButtons[MAXPLAYERS+1],
 
 //Ammo Amounts
 // Track primary and secondary ammo
-int playerClip[MAXPLAYERS + 1][2];
+	playerClip[MAXPLAYERS + 1][2],
 
 // track player ammo based on weapon slot 0 - 4
-int playerAmmo[MAXPLAYERS + 1][4];
-int playerPrimary[MAXPLAYERS + 1];
-int playerSecondary[MAXPLAYERS + 1];
-
-ArrayList g_playerArrayList;
-
-//Bot Spawning
-// ArrayList g_badSpawnPos_Array;
+	playerAmmo[MAXPLAYERS + 1][4],
+	playerPrimary[MAXPLAYERS + 1],
+	playerSecondary[MAXPLAYERS + 1],
 
 // Navmesh Init
 // Handle g_hHidingSpots = null,
 // g_iHidingSpotCount,
 // m_iNumControlPoints,
 // g_iCPHidingSpots[MAX_OBJECTIVES][MAX_HIDING_SPOTS],
-int g_iCPHidingSpotCount[MAX_OBJECTIVES];
+	g_iCPHidingSpotCount[MAX_OBJECTIVES];
 // g_iCPLastHidingSpot[MAX_OBJECTIVES],
 float m_vCPPositions[MAX_OBJECTIVES][3];
 
 // Status
-int g_isMapInit;
+int g_isMapInit,
 
 //0 is over, 1 is active
-int g_iRoundStatus = 0;
-// bool:g_bIsCounterAttackTimerActive = false,
-int g_clientDamageDone[MAXPLAYERS+1];
-int playerPickSquad[MAXPLAYERS + 1];
-bool playerRevived[MAXPLAYERS + 1];
-bool playerInRevivedState[MAXPLAYERS + 1];
-bool g_preRoundInitial = false;
-char g_client_last_classstring[MAXPLAYERS+1][64];
-char g_client_org_nickname[MAXPLAYERS+1][64];
-float g_enemyTimerPos[MAXPLAYERS+1][3];	// Kill Stray Enemy Bots Globals
-float g_enemyTimerAwayPos[MAXPLAYERS+1][3];	// Kill Stray Enemy Bots Globals
-g_playerActiveWeapon[MAXPLAYERS + 1];
-int g_playerMedicHealsAccumulated[MAXPLAYERS+1];
-int g_playerMedicRevivessAccumulated[MAXPLAYERS+1];
-int g_playerNonMedicHealsAccumulated[MAXPLAYERS+1];
-int g_playerNonMedicRevive[MAXPLAYERS+1];
-int g_playerWoundType[MAXPLAYERS+1];
-int g_playerWoundTime[MAXPLAYERS+1];
-//g_hintCoolDown[MAXPLAYERS+1] = 30,
-bool g_hintsEnabled[MAXPLAYERS+1] = true;
-float g_fPlayerLastChat[MAXPLAYERS+1] = {0.0, ...};
+	g_iRoundStatus = 0,
+	g_clientDamageDone[MAXPLAYERS+1],
+	playerPickSquad[MAXPLAYERS + 1],
+	g_playerMedicHealsAccumulated[MAXPLAYERS+1],
+	g_playerMedicRevivessAccumulated[MAXPLAYERS+1],
+	g_playerNonMedicHealsAccumulated[MAXPLAYERS+1],
+	g_playerNonMedicRevive[MAXPLAYERS+1],
+	g_playerWoundType[MAXPLAYERS+1],
+	g_playerWoundTime[MAXPLAYERS+1],
+	g_playerActiveWeapon[MAXPLAYERS + 1];
+	g_playerFirstJoin[MAXPLAYERS+1];
+bool playerRevived[MAXPLAYERS + 1],
+	playerInRevivedState[MAXPLAYERS + 1],
+	g_preRoundInitial = false,
+	g_hintsEnabled[MAXPLAYERS+1] = true;
+char g_client_last_classstring[MAXPLAYERS+1][64],
+	g_client_org_nickname[MAXPLAYERS+1][64];
+float g_enemyTimerPos[MAXPLAYERS+1][3],	// Kill Stray Enemy Bots Globals
+	//g_enemyTimerAwayPos[MAXPLAYERS+1][3], // Kill Stray Enemy Bots Globals
+	g_fPlayerLastChat[MAXPLAYERS+1] = {0.0, ...};
 
-//Wave Based Arrays
-//g_WaveSpawnActive[MAXPLAYERS+1],
 
-int g_playerFirstJoin[MAXPLAYERS+1];
 
 // Player Distance Plugin //Credits to author = "Popoklopsi", url = "http://popoklopsi.de"
 // unit to use 1 = feet, 0 = meters
 int g_iUnitMetric;
+
+ArrayList g_playerArrayList;
 
 // Handle for config
 ConVar sm_respawn_enabled;
@@ -288,14 +404,9 @@ ConVar sm_respawn_check_static_enemy_counter;//= null;
 // Donor tag
 ConVar sm_respawn_enable_donor_tag;
 
-// Related to 'RoundEnd_Protector' plugin
-//ConVar sm_remaininglife = null,
-
 // Medic specific
 ConVar sm_revive_seconds;
-//ConVar sm_revive_bonus = null,
 ConVar sm_revive_distance_metric;
-//ConVar sm_heal_bonus = null,
 ConVar sm_heal_cap_for_bonus;
 ConVar sm_revive_cap_for_bonus;
 ConVar sm_reward_medics_enabled;
@@ -314,9 +425,6 @@ ConVar sm_minor_revive_time;
 ConVar sm_moderate_revive_time;
 ConVar sm_critical_revive_time;
 ConVar sm_non_medic_revive_time;
-//ConVar sm_medpack_health_amount;
-//ConVar sm_multi_loadout_enabled;
-//ConVar sm_bombers_only;
 ConVar sm_non_medic_heal_self_max;
 ConVar sm_elite_counter_attacks;
 ConVar sm_enable_bonus_lives;
@@ -326,7 +434,6 @@ ConVar sm_finale_counter_spec_percent;
 // NAV MESH SPECIFIC CVARS
 //1 = Spawn in ins_spawnpoints, 2 = any spawnpoints that meets criteria, 0 = only at normal spawnpoints at next objective
 ConVar cvarSpawnMode;
-//ConVar cvarMinCounterattackDistance = null, //Min distance from counterattack objective to spawn
 //Min/max distance from players to spawn
 ConVar cvarMinPlayerDistance;
 //Adds to the minplayerdistance cvar when spawning behind player.
@@ -341,162 +448,10 @@ ConVar cvarMaxObjectiveDistance;
 ConVar cvarMaxObjectiveDistanceNav;
 //CanSeeVector Multiplier divide this by cvarMaxPlayerDistance
 ConVar cvarCanSeeVectorMultiplier;
-//Range of ammo resupply
-//ConVar sm_ammo_resupply_range;
 //Delay to resupply
 ConVar sm_resupply_delay;
 //Min/max distance from players to spawn
 ConVar cvarMaxPlayerDistance;
-	
-// Init global variables
-int g_iCvar_respawn_enable;
-//int g_jammerRequired;
-int g_elite_counter_attacks;
-int g_finale_counter_spec_enabled;
-int g_finale_counter_spec_percent;
-// g_elitePeriod,
-// g_elitePeriod_min,
-// g_elitePeriod_max,
-int g_iCvar_revive_enable;
-float g_respawn_counter_chance;
-int g_counterAttack_min_dur_sec;
-int g_counterAttack_max_dur_sec;
-int g_iCvar_respawn_type_team_ins;
-int g_iCvar_respawn_type_team_sec;
-int g_iCvar_respawn_reset_type;
-float g_fCvar_respawn_delay_team_ins;
-float g_fCvar_respawn_delay_team_ins_spec;
-int g_iCvar_enable_track_ammo;
-int g_iCvar_counterattack_type;
-int g_iCvar_counterattack_vanilla;
-int g_iCvar_final_counterattack_type;
-//g_iCvar_SpawnMode,
-
-//Dynamic Respawn cvars
-int g_DynamicRespawn_Distance_mult;
-int g_dynamicSpawnCounter_Perc;
-int g_dynamicSpawn_Perc;
-
-// Fatal dead
-float g_fCvar_fatal_chance;
-float g_fCvar_fatal_head_chance;
-int g_iCvar_fatal_limb_dmg;
-int g_iCvar_fatal_head_dmg;
-int g_iCvar_fatal_burn_dmg;
-int g_iCvar_fatal_explosive_dmg;
-int g_iCvar_fatal_chest_stomach;
-//Dynamic Loadouts
-//g_iCvar_bombers_only,
-//g_iCvar_multi_loadout_enabled,
-
-//Respawn Mode (wave based)
-int g_respawn_mode_team_sec;
-//g_respawn_mode_team_ins,
-//g_respawn_wave_int_team_ins,
-
-int g_cacheObjActive = 0,
-	g_checkStaticAmt,
-	g_checkStaticAmtCntr,
-	g_checkStaticAmtAway,
-	g_checkStaticAmtCntrAway,
-	g_iReinforceTime;
-
-//g_iReinforceTimeSubsequent,
-int g_iReinforceTime_AD_Temp;
-int g_iReinforceTimeSubsequent_AD_Temp;
-int g_iReinforce_Mult;
-int g_iReinforce_Mult_Base;
-int g_iRemaining_lives_team_sec;
-int g_iRemaining_lives_team_ins;
-int g_iRespawn_lives_team_sec;
-int g_iRespawn_lives_team_ins;
-// g_iReviveSeconds,
-int g_iRespawnSeconds;
-int g_secWave_Timer;
-int g_iHeal_amount_paddles;
-int g_iHeal_amount_medPack;
-int g_nonMedicHeal_amount;
-int g_nonMedicRevive_hp;
-int g_minorWoundRevive_hp;
-int g_modWoundRevive_hp;
-int g_critWoundRevive_hp;
-int g_minorWound_dmg;
-int g_moderateWound_dmg;
-int g_medicHealSelf_max;
-int g_nonMedicHealSelf_max;
-int g_nonMedic_maxHealOther;
-int g_minorRevive_time;
-int g_modRevive_time;
-int g_critRevive_time;
-int g_nonMedRevive_time;
-//g_medpack_health_amt,
-int g_botsReady;
-int g_isCheckpoint;
-float g_flMinPlayerDistance;
-float g_flBackSpawnIncrease;
-float g_flMaxPlayerDistance;
-float g_flCanSeeVectorMultiplier;
-float g_flMinObjectiveDistance;
-//float g_flMaxObjectiveDistance,
-//float g_flMaxObjectiveDistanceNav,
-float g_flSpawnAttackDelay;
-//float g_flMinCounterattackDistance,
-
-//Elite bots Counters
-int	g_ins_bot_count_checkpoint_max_org;
-int g_mp_player_resupply_coop_delay_max_org;
-int g_mp_player_resupply_coop_delay_penalty_org;
-int g_mp_player_resupply_coop_delay_base_org;
-int g_bot_attack_aimpenalty_amt_close_org;
-int g_bot_attack_aimpenalty_amt_far_org;
-float g_bot_attack_aimpenalty_time_close_org;
-float g_bot_attack_aimpenalty_time_far_org;
-float g_bot_aim_aimtracking_base_org;
-float g_bot_aim_aimtracking_frac_impossible_org;
-float g_bot_aim_angularvelocity_frac_impossible_org;
-float g_bot_aim_angularvelocity_frac_sprinting_target_org;
-float g_bot_aim_attack_aimtolerance_frac_impossible_org;
-float g_bot_attackdelay_frac_difficulty_impossible_org;
-float g_bot_attack_aimtolerance_newthreat_amt_org;
-float g_bot_attack_aimtolerance_newthreat_amt_mult;
-int g_bot_attack_aimpenalty_amt_close_mult;
-int g_bot_attack_aimpenalty_amt_far_mult;
-float g_bot_attackdelay_frac_difficulty_impossible_mult;
-float g_bot_attack_aimpenalty_time_close_mult;
-float g_bot_attack_aimpenalty_time_far_mult;
-float g_bot_aim_aimtracking_base;
-float g_bot_aim_aimtracking_frac_impossible;
-float g_bot_aim_angularvelocity_frac_impossible;
-float g_bot_aim_angularvelocity_frac_sprinting_target;
-float g_bot_aim_attack_aimtolerance_frac_impossible;
-int g_coop_delay_penalty_base;
-int g_isEliteCounter;
-
-int m_hMyWeapons;
-int m_flNextPrimaryAttack;
-int m_flNextSecondaryAttack;
-
-// KOLOROWE KREDKI
-#define YELLOW 0x01
-#define GREEN 0x04
-
-// SOME DEFINES
-#define MAX_LINE_WIDTH 60
-#define PLUGIN_VERSION "4.2"
-
-// STATS TIME (SET DAYS AFTER STATS ARE DELETE OF NONACTIVE PLAYERS)
-#define PLAYER_STATSOLD 30
-
-// STATS DEFINATION FOR PLAYERS
-int g_iStatKills[MAXPLAYERS+1];
-int g_iStatDeaths[MAXPLAYERS+1];
-int g_iStatHeadShots[MAXPLAYERS+1];
-int g_iStatSuicides[MAXPLAYERS+1];
-int g_iStatRevives[MAXPLAYERS+1];
-int g_iStatHeals[MAXPLAYERS+1];
-
-#define PLUGIN_DESCRIPTION "Respawn dead players via admincommand or by queues"
-#define UPDATE_URL	"http://ins.jballou.com/sourcemod/update-respawn.txt"
 
 // Plugin info
 public Plugin myinfo =
@@ -667,15 +622,10 @@ public void OnPluginStart()
 	
 	// Donor tag
 	sm_respawn_enable_donor_tag = CreateConVar("sm_respawn_enable_donor_tag", "1", "If player has an access to reserved slot, add [DONOR] tag.");
-	
-	// Related to 'RoundEnd_Protector' plugin
-	//sm_remaininglife = CreateConVar("sm_remaininglife", "-1", "Returns total remaining life.");
-	
+		
 	// Medic Revive
 	sm_revive_seconds = CreateConVar("sm_revive_seconds", "5", "Time in seconds medic needs to stand over body to revive");
-	//sm_revive_bonus = CreateConVar("sm_revive_bonus", "1", "Bonus revive score(kill count) for medic");
 	sm_revive_distance_metric = CreateConVar("sm_revive_distance_metric", "1", "Distance metric (0: meters / 1: feet)");
-	//sm_heal_bonus = CreateConVar("sm_heal_bonus", "1", "Bonus heal score(kill count) for medic");
 	sm_heal_cap_for_bonus = CreateConVar("sm_heal_cap_for_bonus", "5000", "Amount of health given to other players to gain a life");
 	sm_revive_cap_for_bonus = CreateConVar("sm_revive_cap_for_bonus", "50", "Amount of revives before medic gains a life");
 	sm_reward_medics_enabled = CreateConVar("sm_reward_medics_enabled", "1", "Enabled rewarding medics with lives? 0 = no, 1 = yes");
@@ -695,8 +645,6 @@ public void OnPluginStart()
 	sm_moderate_revive_time = CreateConVar("sm_moderate_revive_time", "7", "Seconds it takes medic to revive moderate wounded");
 	sm_critical_revive_time = CreateConVar("sm_critical_revive_time", "10", "Seconds it takes medic to revive critical wounded");
 	sm_non_medic_revive_time = CreateConVar("sm_non_medic_revive_time", "30", "Seconds it takes non-medic to revive minor wounded, requires medpack");
-	//sm_medpack_health_amount = CreateConVar("sm_medpack_health_amount", "500", "Amount of health a deployed healthpack has");
-	//sm_ammo_resupply_range = CreateConVar("sm_ammo_resupply_range", "80", "Range to resupply near ammo cache");
 	sm_resupply_delay = CreateConVar("sm_resupply_delay", "5", "Delay loop for resupply ammo");
 	sm_elite_counter_attacks = CreateConVar("sm_elite_counter_attacks", "1", "Enable increased bot skills, numbers on counters?");
 	sm_enable_bonus_lives = CreateConVar("sm_enable_bonus_lives", "1", "Give bonus lives based on X condition? 0|1 ");
@@ -715,8 +663,6 @@ public void OnPluginStart()
 	//Wave interval for insurgents only
 	sm_respawn_wave_int_team_ins = CreateConVar("sm_respawn_wave_int_team_ins", "1", "Time in seconds bots will respawn in waves");
 	
-	CreateConVar("Lua_Ins_Healthkit", PLUGIN_VERSION, PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD);
-	
 	if ((m_hMyWeapons = FindSendPropInfo("CBasePlayer", "m_hMyWeapons")) == -1)	
 		SetFailState("Fatal Error: Unable to find property offset \"CBasePlayer::m_hMyWeapons\" !");
 	
@@ -731,11 +677,9 @@ public void OnPluginStart()
 	// Add reload config console command for admin
 	RegAdminCmd("sm_respawn_reload", Command_Reload, ADMFLAG_SLAY, "sm_respawn_reload");
 	// register roundend admin commands
+	//RegAdminCmd("!discord", Discord_Info, "!discord");
 
 	// Event hooking
-	//Lua Specific
-	//HookEvent("grenade_thrown", Event_GrenadeThrown);
-
 	//For ins_spawnpoint spawning
 	HookEvent("player_spawn", Event_Spawn);
 	HookEvent("player_spawn", Event_SpawnPost, EventHookMode_Post);
@@ -745,8 +689,6 @@ public void OnPluginStart()
 	HookEvent("round_start", Event_RoundStart);
 	HookEvent("round_end", Event_RoundEnd);
 	HookEvent("round_end", Event_RoundEnd_Pre, EventHookMode_Pre);
-	//HookEvent("game_start", Event_GameStart, EventHookMode_PostNoCopy);
-	//HookEvent("game_end", Event_GameEnd, EventHookMode_PostNoCopy);
 	HookEvent("player_pick_squad", Event_PlayerPickSquad_Post, EventHookMode_Post);
 	HookEvent("object_destroyed", Event_ObjectDestroyed_Pre, EventHookMode_Pre);
 	HookEvent("object_destroyed", Event_ObjectDestroyed);
@@ -756,10 +698,7 @@ public void OnPluginStart()
 	HookEvent("controlpoint_captured", Event_ControlPointCaptured_Post, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_connect", Event_PlayerConnect);
-	//HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("weapon_reload", Event_PlayerReload_Pre, EventHookMode_Pre);
-
-	//AddCommandListener(ResupplyListener, "inventory_resupply");
 
 	// NavMesh Botspawn Specific Start
 	cvarSpawnMode.AddChangeHook(CvarChange);
@@ -782,8 +721,6 @@ public void OnPluginStart()
 	sm_moderate_revive_time.AddChangeHook(CvarChange);
 	sm_critical_revive_time.AddChangeHook(CvarChange);
 	sm_non_medic_revive_time.AddChangeHook(CvarChange);
-	//sm_medpack_health_amount.AddChangeHook(CvarChange);
-	//sm_medpack_health_amount.AddChangeHook(CvarChange);
 	
 	// Respawn specific
 	sm_respawn_enabled.AddChangeHook(EnableChanged);
@@ -856,10 +793,6 @@ public void OnPluginStart()
 	LoadTranslations("respawn.phrases");
 	LoadTranslations("nearest_player.phrases.txt");
 	AutoExecConfig(true, "respawn");
-
-	// create config file
-	//AutoExecConfig(true, "plugin.roundendblock");
-	//g_respawn_counter_chance = sm_respawn_counter_chance.FloatValue;
 }
 
 // When cvar changed
@@ -871,12 +804,10 @@ void EnableChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 	if(intNewValue == 1 && intOldValue == 0)
 	{
 		TagsCheck("respawntimes");
-		//HookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
 	}
 	else if(intNewValue == 0 && intOldValue == 1)
 	{
 		TagsCheck("respawntimes", true);
-		//UnhookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
 	}
 }
 
@@ -1259,7 +1190,7 @@ public Action Timer_MapStart(Handle Timer)
 	g_bot_aim_attack_aimtolerance_frac_impossible_org = FindConVar("bot_aim_attack_aimtolerance_frac_impossible").FloatValue;
 
 	CreateTimer(1.0, Timer_CheckEnemyStatic, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(1.0, Timer_CheckEnemyAway, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	//CreateTimer(1.0, Timer_CheckEnemyAway, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 // When player connected server, intialize variables
@@ -1317,6 +1248,13 @@ public Action Command_Reload(int client, int args)
 	//PrintToServer("[RESPAWN] %N reloaded respawn config.", client);
 	ReplyToCommand(client, "[SM] Reloaded 'sourcemod/respawn.cfg' file.");
 }
+
+/*public Action Discord_Info(int client, int args)
+{
+	char textToPrint[32];
+ 	Format(textToPrint, sizeof(textToPrint), "https://discord.gg/3BbGmZR");
+	PrintHintTextToAll(textToPrint);
+}*/
 
 // Respawn function for console command
 public Action Command_Respawn(int client, int args) 
@@ -1806,7 +1744,7 @@ Action Timer_CheckEnemyStatic(Handle timer)
 }
 
 // Check enemy is stuck
-public Action Timer_CheckEnemyAway(Handle timer)
+/*public Action Timer_CheckEnemyAway(Handle timer)
 {
 	//Remove bot weapons when static killed to reduce server performance on dropped items.
 	int primaryRemove = 1;
@@ -1911,8 +1849,7 @@ public Action Timer_CheckEnemyAway(Handle timer)
 		}
 	}
 	return Plugin_Continue;
-}
-
+}*/
 void AddLifeForStaticKilling(int client) 
 {
 	// Respawn type 1
@@ -2736,13 +2673,6 @@ public Action Event_RoundEnd_Pre(Event event, const char[] name, bool dontBroadc
 // When round ends, intialize variables
 public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
-	//Lua Healing kill sound
-	char ent = -1;
-	while ((ent = FindEntityByClassname(ent, "healthkit")) > MaxClients && IsValidEntity(ent))
-	{
-		AcceptEntityInput(ent, "Kill");
-	}
-
 	//Elite Bots Reset
 	if (g_elite_counter_attacks == 1)
 	{
@@ -2754,10 +2684,6 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 	g_fRespawnPosition[0] = 0.0;
 	g_fRespawnPosition[1] = 0.0;
 	g_fRespawnPosition[2] = 0.0;
-
-	// Reset remaining life
-	//Handle hCvar = FindConVar("sm_remaininglife");
-	//SetConVarInt(hCvar, -1);
 
 	// Cooldown revive
 	g_iEnableRevive = 0;
@@ -2773,7 +2699,6 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 public Action Event_ControlPointCaptured_Pre(Event event, const char[] name, bool dontBroadcast)
 {
 	//Clear bad spawn array
-	//ClearArray(g_badSpawnPos_Array);
 	for (int client = 0; client < MaxClients; client++) 
 	{
 		if (!IsValidClient(client) || client <= 0)
@@ -3002,9 +2927,6 @@ public Action Event_ControlPointCaptured_Post(Event event, const char[] name, bo
 			}
 		}
 	}
-		// Elite Bots Reset
-		// if (g_elite_counter_attacks == 1)
-		// 	CreateTimer(5.0, Timer_EliteBots);
 
 	// Update cvars
 	UpdateRespawnCvars();
@@ -3033,7 +2955,6 @@ public Action Event_ControlPointCaptured_Post(Event event, const char[] name, bo
 public Action Event_ObjectDestroyed_Pre(Event event, const char[] name, bool dontBroadcast)
 {
 	//Clear bad spawn array
-	//ClearArray(g_badSpawnPos_Array);
 	for (int client = 0; client < MaxClients; client++)
 	{
 		if (!IsValidClient(client) || client <= 0 || !IsClientInGame(client)) continue;
@@ -3049,7 +2970,6 @@ public Action Event_ObjectDestroyed_Pre(Event event, const char[] name, bool don
 	g_checkStaticAmt = sm_respawn_check_static_enemy.IntValue;
 	g_checkStaticAmtCntr = sm_respawn_check_static_enemy_counter.IntValue;
 
-	
 	int ncp = Ins_ObjectiveResource_GetProp("m_iNumControlPoints"); // Get the number of control points	
 	int acp = Ins_ObjectiveResource_GetProp("m_nActivePushPointIndex"); // Get active push point
 
@@ -3169,14 +3089,12 @@ public Action Event_ObjectDestroyed_Pre(Event event, const char[] name, bool don
 		cvar = FindConVar("mp_checkpoint_counterattack_always");
 		cvar.SetInt(1, true, false);
 
-		// Call music timer
-		//CreateTimer(COUNTER_ATTACK_MUSIC_DURATION, Timer_CounterAttackSound);
-
 		//Create Counter End Timer
 		g_isEliteCounter = 1;
 		CreateTimer(cvar_ca_dur.FloatValue + 1.0, Timer_CounterAttackEnd);
 
-		if (g_elite_counter_attacks == 1) {
+		if (g_elite_counter_attacks == 1) 
+		{
 			EnableDisableEliteBotCvars(1, 1);
 			ConVar tCvar = FindConVar("ins_bot_count_checkpoint_max");
 			int tCvarIntValue = FindConVar("ins_bot_count_checkpoint_max").IntValue;
@@ -3184,15 +3102,17 @@ public Action Event_ObjectDestroyed_Pre(Event event, const char[] name, bool don
 			tCvar.SetInt(tCvarIntValue, true, false);
 		}
 	}
+	
 	// Not occurs counter attack
 	else
 	{
 		cvar = null;
-		//PrintToServer("COUNTER NO");
 		cvar = FindConVar("mp_checkpoint_counterattack_disable");
 		cvar.SetInt(1, true, false);
 	}
+
 	g_AIDir_TeamStatus = AI_Director_SetMinMax(g_AIDir_TeamStatus, g_AIDir_TeamStatus_min, g_AIDir_TeamStatus_max);
+	
 	return Plugin_Continue;
 }
 
@@ -3260,11 +3180,6 @@ public Action Event_ObjectDestroyed_Post(Event event, const char[] name, bool do
 		}
 	}
 
-	// //Elite Bots Reset
-	// if (g_elite_counter_attacks == 1)
-	// 	CreateTimer(5.0, Timer_EliteBots);
-	//PrintToServer("CONTROL POINT CAPTURED POST");
-
 	// Get the number of control points
 	int ncp = Ins_ObjectiveResource_GetProp("m_iNumControlPoints");
 	
@@ -3328,14 +3243,6 @@ void EnableDisableEliteBotCvars(int tEnabled, int isFinale)
 		ConVar cv = FindConVar("bot_attack_aimtolerance_newthreat_amt");
 		cv.FloatValue -= cv.FloatValue - g_bot_attack_aimtolerance_newthreat_amt_mult;
 
-		/*
-
-		tCvar = FindConVar("bot_attack_aimtolerance_newthreat_amt");
-		tCvarIntValue = FindConVar("bot_attack_aimtolerance_newthreat_amt");
-		tCvarIntValue = tCvarIntValue - g_bot_attack_aimtolerance_newthreat_amt_mult;
-		tCvar.SetFloat(tCvarIntValue, true, false);
-		*/
-
 		tCvar = FindConVar("bot_aim_aimtracking_base");
 		tCvarFloatValue = FindConVar("bot_aim_aimtracking_base").FloatValue;
 		tCvarFloatValue = tCvarFloatValue - g_bot_aim_aimtracking_base;
@@ -3364,7 +3271,6 @@ void EnableDisableEliteBotCvars(int tEnabled, int isFinale)
 	}
 	else 
 	{
-		//PrintToServer("BOT_SETTINGS_APPLIED_2");
 		tCvar = FindConVar("ins_bot_count_checkpoint_max");
 		tCvar.SetInt(g_ins_bot_count_checkpoint_max_org, true, false);
 		tCvar = FindConVar("mp_player_resupply_coop_delay_max");
@@ -3411,7 +3317,6 @@ Action Timer_FinaleCounterAssignLives(Handle timer)
 // When counter-attack end, reset reinforcement time
 Action Timer_CounterAttackEnd(Handle timer) 
 {
-
 	//Disable elite bots when not in counter
 	if (g_isEliteCounter == 1 && g_elite_counter_attacks == 1) 
 	{
@@ -3425,11 +3330,7 @@ Action Timer_CounterAttackEnd(Handle timer)
 			ResetSecurityLives();
 	}
 
-		// Stop counter-attack music
-		//StopCounterAttackMusic();
-
-		// Reset variable
-	//g_bIsCounterAttackTimerActive = false;
+	// Reset variable
 	ConVar cvar = null;
 	cvar = FindConVar("mp_checkpoint_counterattack_always");
 	cvar.SetInt(0, true, false);
@@ -3454,22 +3355,6 @@ Action Timer_CounterAttackEnd(Handle timer)
 	}
 	return Plugin_Stop;
 }
-
-/*
-// Stop counter-attack music
-void StopCounterAttackMusic()
-{
-	for (new i = 1; i <= MaxClients; i++)
-	{
-		if (IsClientInGame(i) && IsClientConnected(i) && !IsFakeClient(i))
-		{
-			//ClientCommand(i, "snd_restart");
-			//FakeClientCommand(i, "snd_restart");
-			StopSound(i, SNDCHAN_STATIC, "*cues/INS_GameMusic_AboutToAttack_A.ogg");
-		}
-	}
-}
-*/
 
 //Run this to mark a bot as ready to spawn. Add tokens if you want them to be able to spawn.
 void ResetSecurityLives() 
@@ -3605,22 +3490,21 @@ public Action Event_PlayerPickSquad_Post(Event event, const char[] name, bool do
 
 	// Get player nickname
 	char sNewNickname[64];
-
-	// Medic class
-	if (StrContains(g_client_last_classstring[client], "medic") > -1)
+	if (IsClientConnected(client) && team == TEAM_1_SEC)
+	//if (StrContains(g_client_last_classstring[client], "medic") > -1)
 	{
-		// Admin medic
-		if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_GENERIC))
-			Format(sNewNickname, sizeof(sNewNickname), "[ADMIN][MEDIC] %s", g_client_org_nickname[client]);
-		// Root Admin
-		else if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_ROOT))
-			Format(sNewNickname, sizeof(sNewNickname), "[ADMIN][MEDIC] %s", g_client_org_nickname[client]);
-		// Donor medic
-		else if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_RESERVATION))
-			Format(sNewNickname, sizeof(sNewNickname), "[DONOR][MEDIC] %s", g_client_org_nickname[client]);
-		// Normal medic
+		// Admin player
+		if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_CUSTOM3))
+			Format(sNewNickname, sizeof(sNewNickname), "[ADMIN] %s", g_client_org_nickname[client]);
+		// LDR player
+		else if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_CUSTOM2))
+			Format(sNewNickname, sizeof(sNewNickname), "[LDR] %s", g_client_org_nickname[client]);
+		// Donor player
+		else if (GetConVarInt(sm_respawn_enable_donor_tag) == 1 && (GetUserFlagBits(client) & ADMFLAG_CUSTOM1))
+			Format(sNewNickname, sizeof(sNewNickname), "[DONOR] %s", g_client_org_nickname[client]);
+		// Normal player
 		else
-			Format(sNewNickname, sizeof(sNewNickname), "[MEDIC] %s", g_client_org_nickname[client]);
+			Format(sNewNickname, sizeof(sNewNickname), "%s", g_client_org_nickname[client]);
 	}
 
 	// Set player nickname
@@ -4476,7 +4360,7 @@ Action Timer_PlayerRespawn(Handle timer, any client)
                     }
                     else
                     {
-                        Format(sRemainingTime, sizeof(sRemainingTime),"%s for %d damage | wait patiently for a medic\n\n                Reinforcing in %d second%s (%d lives left) ", woundType, g_clientDamageDone[client], g_iRespawnTimeRemaining[client], (g_iRespawnTimeRemaining[client] > 1 ? "s" : ""), g_iSpawnTokens[client]);
+                        Format(sRemainingTime, sizeof(sRemainingTime),"%s for %d damage | wait patiently for a medic\n\n reinforcing in %d second%s (%d lives left) ", woundType, g_clientDamageDone[client], g_iRespawnTimeRemaining[client], (g_iRespawnTimeRemaining[client] > 1 ? "s" : ""), g_iSpawnTokens[client]);
                     }
                     PrintCenterText(client, sRemainingTime);
                 }
@@ -4572,6 +4456,7 @@ public Action Timer_ReviveMonitor(Handle timer, any data)
 		
 		// Is valid iMedic?
 		if (IsPlayerAlive(iMedic) && (StrContains(g_client_last_classstring[iMedic], "medic") > -1))
+		//if (IsPlayerAlive(iMedic)) 
 		{
 			// Check is there nearest body
 			iInjured = g_iNearestBody[iMedic];
@@ -4662,11 +4547,11 @@ public Action Timer_ReviveMonitor(Handle timer, any data)
 						//PrintToChatAll("%s", sBuf);
 						
 						// Hint to iMedic
-						Format(sBuf, 255,"You revived %N from a %s", iInjured, woundType);
+						Format(sBuf, 255,"You revived %N", iInjured, woundType);
 						PrintHintText(iMedic, "%s", sBuf);
 						
 						// Hint to victim
-						Format(sBuf, 255,"%N revived you from a %s", iMedic, woundType);
+						Format(sBuf, 255,"%N revived you", iMedic, woundType);
 						PrintHintText(iInjured, "%s", sBuf);
 						g_iStatRevives[iMedic]++;
 			
@@ -4675,7 +4560,7 @@ public Action Timer_ReviveMonitor(Handle timer, any data)
 						int iReviveCap = sm_revive_cap_for_bonus.IntValue;
 
 						// Hint to iMedic
-						Format(sBuf, 255,"You revived %N from a %s | Revives remaining til bonus life: %d", iInjured, woundType, (iReviveCap - g_playerMedicRevivessAccumulated[iMedic]));
+						Format(sBuf, 255,"You revived %N ", iInjured, woundType, (iReviveCap - g_playerMedicRevivessAccumulated[iMedic]));
 						PrintHintText(iMedic, "%s", sBuf);
 						if (g_playerMedicRevivessAccumulated[iMedic] >= iReviveCap)
 						{
@@ -4699,6 +4584,7 @@ public Action Timer_ReviveMonitor(Handle timer, any data)
 		}
 		//Non Medics with Medic Pack
 		else if (IsPlayerAlive(iMedic) && !(StrContains(g_client_last_classstring[iMedic], "medic") > -1))
+		//else if (IsPlayerAlive(iMedic))
 		{
 			//PrintToServer("Non-Medic Reviving..");
 			// Check is there nearest body

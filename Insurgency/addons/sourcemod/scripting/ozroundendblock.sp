@@ -32,7 +32,6 @@
 #include <smlib>
 #define REQUIRE_EXTENSIONS
 
-
 // This will be used for checking which team the player is on before repsawning them
 #define SPECTATOR_TEAM	0
 #define TEAM_SPEC  1
@@ -535,7 +534,7 @@ public Action Event_PlayerDeathPre(Handle event, const char[] name, bool dontBro
 			//if (teamSecCount <=6)
 			if (teamSecCount <= 2)
 				iAliveAllowed = GetRandomInt(1, 2);
-			if (teamSecCount > 1 && teamSecCount <= 8)
+			if (teamSecCount > 1 && teamSecCount <= 4)
 			//if (teamSecCount > 6 && teamSecCount <= 10)
 				iAliveAllowed = GetRandomInt(1, 4);
 			else

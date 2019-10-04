@@ -454,7 +454,7 @@ public GetWeaponData() {
 				continue;
 			if(GetEdictClassname(i, name, sizeof(name))) {
 				if (StrContains(name,"weapon_") == 0) {
-					GetWeaponId(i);
+					//GetWeaponId(i);
 				}
 			}
 		}
@@ -484,7 +484,7 @@ reset_round_stats_all()
 	}
 }
 // Get weapon id of a given weapon entity
-GetWeaponId(i) {
+/*GetWeaponId(i) {
 	if (i < 0) {
 		return -1;
 	}
@@ -498,7 +498,7 @@ GetWeaponId(i) {
 		InsLog(DEBUG,"Weapon %s not in trie, added as index %d", name,m_hWeaponDefinitionHandle);
 	}
 	return m_hWeaponDefinitionHandle;
-}
+}*/
 
 dump_player_stats(client)
 {
@@ -670,7 +670,7 @@ public Native_Weapon_GetWeaponId(Handle:plugin, numParams)
 	new iEntity = FindEntityByClassname(-1,weapon_name);
 	if (iEntity)
 	{
-		return GetWeaponId(iEntity);
+		//return GetWeaponId(iEntity);
 	}
 	else
 	{
