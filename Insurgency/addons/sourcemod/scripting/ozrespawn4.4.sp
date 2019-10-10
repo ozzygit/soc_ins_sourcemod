@@ -113,8 +113,8 @@ int g_iCvar_fatal_limb_dmg,
 	g_cacheObjActive = 0,
 	g_checkStaticAmt,
 	g_checkStaticAmtCntr,
-	//g_checkStaticAmtAway,
-	//g_checkStaticAmtCntrAway,
+	//g_checkStaticAmtAway, - Not being used as commented function out on 10/10
+	//g_checkStaticAmtCntrAway, - Not being used as commented function out on 10/10
 	g_iReinforceTime,
 	g_iReinforceTime_AD_Temp,
 	g_iReinforceTimeSubsequent_AD_Temp,
@@ -285,9 +285,9 @@ bool playerRevived[MAXPLAYERS + 1],
 	g_hintsEnabled[MAXPLAYERS+1] = true;
 char g_client_last_classstring[MAXPLAYERS+1][64],
 	g_client_org_nickname[MAXPLAYERS+1][64];
-float g_enemyTimerPos[MAXPLAYERS+1][3],	// Kill Stray Enemy Bots Globals
-	//g_enemyTimerAwayPos[MAXPLAYERS+1][3], // Kill Stray Enemy Bots Globals
-	g_fPlayerLastChat[MAXPLAYERS+1] = {0.0, ...};
+//float g_enemyTimerPos[MAXPLAYERS+1][3],	// Kill Stray Enemy Bots Globals - - Not being used as commented function out on 10/10
+//	g_enemyTimerAwayPos[MAXPLAYERS+1][3], // Kill Stray Enemy Bots Globals - - Not being used as commented function out on 10/10
+ //float g_fPlayerLastChat[MAXPLAYERS+1] = {0.0, ...}; - Commented out on 10/10 due to tag mismatch and suspect may not be needed
 
 
 
@@ -1189,8 +1189,9 @@ public Action Timer_MapStart(Handle Timer)
 	g_bot_aim_angularvelocity_frac_sprinting_target_org = FindConVar("bot_aim_angularvelocity_frac_sprinting_target").FloatValue;
 	g_bot_aim_attack_aimtolerance_frac_impossible_org = FindConVar("bot_aim_attack_aimtolerance_frac_impossible").FloatValue;
 
-	CreateTimer(1.0, Timer_CheckEnemyStatic, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	//CreateTimer(1.0, Timer_CheckEnemyAway, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+//  Commented below two lines out as those functions are commented out
+//	CreateTimer(1.0, Timer_CheckEnemyStatic, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+//	CreateTimer(1.0, Timer_CheckEnemyAway, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 // When player connected server, intialize variables
@@ -1633,6 +1634,9 @@ Action Timer_ResetBotFlankSpawning(Handle timer)
 	return Plugin_Continue;
 }
 
+/*
+Commented out Timer_CheckEnemyStatic and Timer_CheckEnemyAway on 10/10 to troubleshoot SM errors spamming and see if there is consequences
+
 
 // Check enemy is stuck
 Action Timer_CheckEnemyStatic(Handle timer) 
@@ -1744,7 +1748,7 @@ Action Timer_CheckEnemyStatic(Handle timer)
 }
 
 // Check enemy is stuck
-/*public Action Timer_CheckEnemyAway(Handle timer)
+public Action Timer_CheckEnemyAway(Handle timer)
 {
 	//Remove bot weapons when static killed to reduce server performance on dropped items.
 	int primaryRemove = 1;
@@ -1849,7 +1853,13 @@ Action Timer_CheckEnemyStatic(Handle timer)
 		}
 	}
 	return Plugin_Continue;
-}*/
+}
+
+*/
+
+//Commenting out on 10/10 as function is not called upon
+
+/*
 void AddLifeForStaticKilling(int client) 
 {
 	// Respawn type 1
@@ -1863,7 +1873,7 @@ void AddLifeForStaticKilling(int client)
 		g_iRemaining_lives_team_ins++;
 	}
 }
-
+*/
 
 // Update player's gear
 void SetPlayerAmmo(int client)
@@ -2714,8 +2724,8 @@ public Action Event_ControlPointCaptured_Pre(Event event, const char[] name, boo
 		}
 	}
 
-	g_checkStaticAmt = GetConVarInt(sm_respawn_check_static_enemy);
-	g_checkStaticAmtCntr = GetConVarInt(sm_respawn_check_static_enemy_counter);
+//	g_checkStaticAmt = GetConVarInt(sm_respawn_check_static_enemy); - Not being used as commented function out on 10/10
+//	g_checkStaticAmtCntr = GetConVarInt(sm_respawn_check_static_enemy_counter); - Not being used as commented function out on 10/10
 
 	int ncp = Ins_ObjectiveResource_GetProp("m_iNumControlPoints"); // Get the number of control points
 	int acp = Ins_ObjectiveResource_GetProp("m_nActivePushPointIndex"); // Get active push point
@@ -2967,8 +2977,10 @@ public Action Event_ObjectDestroyed_Pre(Event event, const char[] name, bool don
 		}
 	}
 
-	g_checkStaticAmt = sm_respawn_check_static_enemy.IntValue;
-	g_checkStaticAmtCntr = sm_respawn_check_static_enemy_counter.IntValue;
+	
+	//Commenting out below two lines as functions not used as commented out on 10/10
+//	g_checkStaticAmt = sm_respawn_check_static_enemy.IntValue;
+//	g_checkStaticAmtCntr = sm_respawn_check_static_enemy_counter.IntValue;
 
 	int ncp = Ins_ObjectiveResource_GetProp("m_iNumControlPoints"); // Get the number of control points	
 	int acp = Ins_ObjectiveResource_GetProp("m_nActivePushPointIndex"); // Get active push point
@@ -3486,7 +3498,7 @@ public Action Event_PlayerPickSquad_Post(Event event, const char[] name, bool do
 		g_iHurtFatal[client] = -1;
 	}
 
-	g_fPlayerLastChat[client] = GetGameTime();
+	//g_fPlayerLastChat[client] = GetGameTime(); - Commented out on 10/10 due to tag mismatch and suspect may not be needed
 
 	// Get player nickname
 	char sNewNickname[64];
