@@ -2567,8 +2567,8 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
 	g_AIDir_TeamStatus = 50;
 	g_AIDir_BotReinforceTriggered = false;
 	g_iReinforceTime = sm_respawn_reinforce_time.IntValue;
-	g_checkStaticAmt = GetConVarInt(sm_respawn_check_static_enemy);
-	g_checkStaticAmtCntr = GetConVarInt(sm_respawn_check_static_enemy_counter);
+	//g_checkStaticAmt = GetConVarInt(sm_respawn_check_static_enemy); - Not being used as commented function out on 10/10
+	//g_checkStaticAmtCntr = GetConVarInt(sm_respawn_check_static_enemy_counter); - Not being used as commented function out on 10/10
 	g_secWave_Timer = g_iRespawnSeconds;
 	//Round_Start CVAR Sets ------------------ END -- vs using HookConVarChange
 
