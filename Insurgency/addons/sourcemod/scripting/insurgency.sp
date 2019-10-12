@@ -77,7 +77,7 @@ public APLRes:Plugin_Setup_natives() {
 	CreateNative("Ins_DecrementAmmo", Native_Weapon_DecrementAmmo);
 	CreateNative("Ins_AddMags", Native_Player_AddMags);
 	CreateNative("Ins_GetWeaponName", Native_Weapon_GetWeaponName);
-	CreateNative("Ins_GetWeaponId", Native_Weapon_GetWeaponId);
+	//CreateNative("Ins_GetWeaponId", Native_Weapon_GetWeaponId);
 
 	CreateNative("Ins_ObjectiveResource_GetProp", Native_ObjectiveResource_GetProp);
 	CreateNative("Ins_ObjectiveResource_GetPropFloat", Native_ObjectiveResource_GetPropFloat);
@@ -309,7 +309,7 @@ public UpdateAllDataSources()
 	GetEntity_ObjectiveResource(1);
 	GetEntity_GameRulesProxy(1);
 	GetEntity_PlayerManager(1);
-	GetWeaponData();
+	//GetWeaponData();
 	GetTeams(false);
 	GetStatus();
 //CreateTimer(4.5, GetStatus);
@@ -441,21 +441,27 @@ GetEntity_PlayerManager(always=0) {
 
 // Get data for each weapon type in game. Tracks classname and id
 // TODO: Get print name localization
-public GetWeaponData() {
-	if (g_weap_array == INVALID_HANDLE) {
+public GetWeaponData() 
+{
+	if (g_weap_array == INVALID_HANDLE) 
+	{
 		g_weap_array = CreateArray(MAX_DEFINABLE_WEAPONS);
-		for (new i;i<MAX_DEFINABLE_WEAPONS;i++) {
+		for (new i;i<MAX_DEFINABLE_WEAPONS;i++) 
+		{
 			PushArrayString(g_weap_array, "");
 		}
-		InsLog(DEBUG,"starting LoadValues");
-		new String:name[32];
-		for(new i=0;i<= GetMaxEntities() ;i++) {
-			if(!IsValidEntity(i))
-				continue;
-			if(GetEdictClassname(i, name, sizeof(name))) {
-				if (StrContains(name,"weapon_") == 0) {
-					//GetWeaponId(i);
-				}
+
+		//InsLog(DEBUG,"starting LoadValues");
+		//new String:name[32];
+		//for(new i=0;i<= GetMaxEntities() ;i++) 
+		{
+		//	if(!IsValidEntity(i))
+		//		continue;
+			//if(GetEdictClassname(i, name, sizeof(name))) 
+			{
+			//	if (StrContains(name,"weapon_") == 0) {
+			//		GetWeaponId(i);
+			//	}
 			}
 		}
 	}
@@ -484,7 +490,8 @@ reset_round_stats_all()
 	}
 }
 // Get weapon id of a given weapon entity
-/*GetWeaponId(i) {
+/*
+GetWeaponId(i) {
 	if (i < 0) {
 		return -1;
 	}
@@ -498,7 +505,8 @@ reset_round_stats_all()
 		InsLog(DEBUG,"Weapon %s not in trie, added as index %d", name,m_hWeaponDefinitionHandle);
 	}
 	return m_hWeaponDefinitionHandle;
-}*/
+}
+*/
 
 dump_player_stats(client)
 {
@@ -655,6 +663,7 @@ public Native_InCounterAttack(Handle:plugin, numParams)
 	return InCounterAttack();
 }
 
+/*
 public Native_Weapon_GetWeaponId(Handle:plugin, numParams)
 {
 	new len;
@@ -670,7 +679,7 @@ public Native_Weapon_GetWeaponId(Handle:plugin, numParams)
 	new iEntity = FindEntityByClassname(-1,weapon_name);
 	if (iEntity)
 	{
-		//return GetWeaponId(iEntity);
+		return GetWeaponId(iEntity);
 	}
 	else
 	{
@@ -682,11 +691,13 @@ public Native_Weapon_GetWeaponId(Handle:plugin, numParams)
 	}
 	return -1;
 }
+*/
+
 public Native_Weapon_GetWeaponName(Handle:plugin, numParams)
 {
 	new weaponid = GetNativeCell(1);
 	decl String:strBuf[32];
-	GetWeaponData();
+	//GetWeaponData();
 	GetArrayString(g_weap_array, weaponid, strBuf, sizeof(strBuf));
 	new maxlen = GetNativeCell(3);
 	SetNativeString(2, strBuf, maxlen+1);
