@@ -1,18 +1,13 @@
 #if defined _insurgencydy_included
   #endinput
 #endif
-#define _insurgencydy_included
 
-//#include <sourcemod>
-//#include <sdktools>
-//#include <loghelper>
+#define _insurgencydy_included
 #if defined REQUIRE_PLUGIN
 #undef REQUIRE_PLUGIN
-//#include <updater>
 #include <smlib>
 #define REQUIRE_PLUGIN
 #else
-//#include <updater>
 #include <smlib>
 #endif
 
@@ -27,7 +22,7 @@
 #define MAX_CLASS_LEN 64
 #define MAX_CONTROLPOINTS 64
 #define PREFIX_LEN 7
-#define MAX_SQUADS 16
+#define MAX_SQUADS 30
 #define SQUAD_SIZE 32
 #define MAX_MAPS 256
 #define MAX_GAMEMODES 32
@@ -251,25 +246,19 @@
 #define		COLOR_YELLOW				"FFFF00FF"
 #define		COLOR_YELLOWGREEN			"9ACD32FF"
 native int Ins_ObjectiveResource_GetProp(const char[] prop, int size = 4, int element = 0);
-//native Ins_Log(ELOG_LEVEL:level, const char[] format, any ...);
 native int Ins_GetMaxClip1(int weapon);
 native int Ins_GetWeaponGetMaxClip1(int weapon);
 native int Ins_GetDefaultClip1(int weapon);
 native void Ins_DecrementAmmo(int weapon, int value);
-//native Ins_AddMags(client, value);
 native float Ins_ObjectiveResource_GetPropFloat(const char[] prop, int size = 4, int element = 0);
 native int Ins_ObjectiveResource_GetPropEnt(const char[] prop, int element = 0);
 native bool Ins_ObjectiveResource_GetPropBool(const char[] prop, int element = 0);
 native int Ins_ObjectiveResource_GetPropVector(const char[] prop, float vec[3], int element = 0);
 native int Ins_ObjectiveResource_GetPropString(const char prop, char[] buffer, int maxlen);
-
 native bool Ins_InCounterAttack();
-
 native int Ins_GetPlayerScore(int client);
 native int Ins_GetPlayerClass(int client, char[] buffer, int maxlen);
 native void Ins_GetClassName(int squad, int squad_slot);
-//native GameLogic_();
-
 native void Ins_GetWeaponName(int weaponid, char[] buffer, int maxlen);
 native int Ins_GetWeaponId(char[] weapon_name);
 
