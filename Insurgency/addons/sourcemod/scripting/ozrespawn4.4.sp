@@ -17,11 +17,11 @@
 
 #pragma dynamic 131072 // Increase heap size
 #pragma semicolon 1
-#pragma newdecls required
+//#pragma newdecls required
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
-#include <insurgencydy>
+#include <insurgency2>
 #include <smlib>
 #undef REQUIRE_EXTENSIONS
 #include <cstrike>
@@ -91,6 +91,8 @@ int g_iCvar_respawn_enable,
 	g_iCvar_final_counterattack_type;
 float g_fCvar_respawn_delay_team_ins,
 	g_respawn_counter_chance,
+	g_iObjResEntity;
+	char g_iObjResEntityNetClass[32],
 	g_fCvar_respawn_delay_team_ins_spec;
 
 
@@ -111,8 +113,8 @@ int g_iCvar_fatal_limb_dmg,
 //Respawn Mode (wave based)
 	g_respawn_mode_team_sec,
 	g_cacheObjActive = 0,
-	g_checkStaticAmt,
-	g_checkStaticAmtCntr,
+//	g_checkStaticAmt, - Not being used as commented function out on 10/10
+//	g_checkStaticAmtCntr, - Not being used as commented function out on 10/10
 	//g_checkStaticAmtAway, - Not being used as commented function out on 10/10
 	//g_checkStaticAmtCntrAway, - Not being used as commented function out on 10/10
 	g_iReinforceTime,
@@ -293,6 +295,24 @@ char g_client_last_classstring[MAXPLAYERS+1][64],
 
 // Player Distance Plugin //Credits to author = "Popoklopsi", url = "http://popoklopsi.de"
 // unit to use 1 = feet, 0 = meters
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max) {
+	CreateNative("Ins_ObjectiveResource_GetProp", Native_ObjectiveResource_GetProp);
+	//CreateNative("Ins_ObjectiveResource_GetPropFloat", Native_ObjectiveResource_GetPropFloat);
+	//CreateNative("Ins_ObjectiveResource_GetPropEnt", Native_ObjectiveResource_GetPropEnt);
+	//CreateNative("Ins_ObjectiveResource_GetPropBool", Native_ObjectiveResource_GetPropBool);
+	CreateNative("Ins_ObjectiveResource_GetPropVector", Native_ObjectiveResource_GetPropVector);
+	//CreateNative("Ins_ObjectiveResource_GetPropString", Native_ObjectiveResource_GetPropString);
+
+	CreateNative("Ins_InCounterAttack", Native_InCounterAttack);
+	//CreateNative("Ins_Log", Native_Log);
+
+	//CreateNative("Ins_GetPlayerScore", Native_GetPlayerScore);
+	//CreateNative("Ins_GetPlayerClass", Native_GetPlayerClass);
+
+	return APLRes_Success;
+}
+
 int g_iUnitMetric;
 
 ArrayList g_playerArrayList;
@@ -398,8 +418,9 @@ ConVar sm_respawn_reinforce_multiplier;
 ConVar sm_respawn_reinforce_multiplier_base;
 
 // Monitor static enemy
-ConVar sm_respawn_check_static_enemy;//= null,
-ConVar sm_respawn_check_static_enemy_counter;//= null;
+//Commenting out below two lines - Not being used as commented function out on 10/10
+//ConVar sm_respawn_check_static_enemy;//= null,
+//ConVar sm_respawn_check_static_enemy_counter;//= null;
 
 // Donor tag
 ConVar sm_respawn_enable_donor_tag;
@@ -617,8 +638,9 @@ public void OnPluginStart()
 	sm_respawn_reinforce_multiplier_base = CreateConVar("sm_respawn_reinforce_multiplier_base", "10", "This is the base int number added to the division multiplier, so (10 * reinforce_mult + base_mult)");
 
 	// Control static enemy
-	sm_respawn_check_static_enemy = CreateConVar("sm_respawn_check_static_enemy", "120", "Seconds amount to check if an AI has moved probably stuck");
-	sm_respawn_check_static_enemy_counter = CreateConVar("sm_respawn_check_static_enemy_counter", "10", "Seconds amount to check if an AI has moved during counter");
+	//Commenting out below two lines - Not being used as commented function out on 10/10
+	//sm_respawn_check_static_enemy = CreateConVar("sm_respawn_check_static_enemy", "120", "Seconds amount to check if an AI has moved probably stuck");
+	//sm_respawn_check_static_enemy_counter = CreateConVar("sm_respawn_check_static_enemy_counter", "10", "Seconds amount to check if an AI has moved during counter");
 	
 	// Donor tag
 	sm_respawn_enable_donor_tag = CreateConVar("sm_respawn_enable_donor_tag", "1", "If player has an access to reserved slot, add [DONOR] tag.");
@@ -1155,8 +1177,8 @@ public Action Timer_MapStart(Handle Timer)
 	//CreateTimer(1.0, Timer_ElitePeriodTick, _ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	// Static enemy check timer
-	g_checkStaticAmt = sm_respawn_check_static_enemy.IntValue;
-	g_checkStaticAmtCntr = sm_respawn_check_static_enemy_counter.IntValue;
+	//g_checkStaticAmt = sm_respawn_check_static_enemy.IntValue; - Not being used as commented function out on 10/10
+	//g_checkStaticAmtCntr = sm_respawn_check_static_enemy_counter.IntValue; - Not being used as commented function out on 10/10
 	
 	//Elite Bot cvar multipliers (used to minus off top of original cvars)
 	g_bot_attack_aimtolerance_newthreat_amt_mult = 0.8;
@@ -1250,6 +1272,69 @@ public Action Command_Reload(int client, int args)
 	ReplyToCommand(client, "[SM] Reloaded 'sourcemod/respawn.cfg' file.");
 }
 
+//From insurgency.sp
+public Native_ObjectiveResource_GetProp(Handle:plugin, numParams)
+{
+	new len;
+	GetNativeStringLength(1, len);
+	if (len <= 0)
+	{
+	  return false;
+	}
+	new String:prop[len+1],retval=-1;
+	GetNativeString(1, prop, len+1);
+	new size = GetNativeCell(2);
+	new element = GetNativeCell(3);
+	GetEntity_ObjectiveResource();
+	if (g_iObjResEntity > 0)
+	{
+		retval = GetEntData(g_iObjResEntity, FindSendPropInfo(g_iObjResEntityNetClass, prop) + (size * element));
+	}
+	return retval;
+}
+
+public Native_ObjectiveResource_GetPropVector(Handle:plugin, numParams) {
+	new len;
+	GetNativeStringLength(1, len);
+	if (len <= 0) {
+	  return false;
+	}
+	new String:prop[len+1];
+	new size = 12; // Size of data slice - 3x4-byte floats
+	GetNativeString(1, prop, len+1);
+	new element = GetNativeCell(3);
+	GetEntity_ObjectiveResource();
+	new Float:result[3];
+	if (g_iObjResEntity > 0) {
+		GetEntDataVector(g_iObjResEntity, FindSendPropInfo(g_iObjResEntityNetClass, prop) + (size * element), result);
+		SetNativeArray(2, result, 3);
+	}
+	return 1;
+}
+
+GetEntity_ObjectiveResource(always=0) {
+	if (((g_iObjResEntity < 1) || !IsValidEntity(g_iObjResEntity)) || (always))
+	{
+		g_iObjResEntity = FindEntityByClassname(0,"ins_objective_resource");
+		GetEntityNetClass(g_iObjResEntity, g_iObjResEntityNetClass, sizeof(g_iObjResEntityNetClass));
+		InsLog(DEBUG,"g_iObjResEntityNetClass %s",g_iObjResEntityNetClass);
+	}
+	if (g_iObjResEntity)
+		return g_iObjResEntity;
+	InsLog(WARN,"GetEntity_ObjectiveResource failed!");
+	return -1;
+}
+
+bool InCounterAttack() {
+	bool retval;
+	retval = bool:GameRules_GetProp("m_bCounterAttack");
+	return retval;
+}
+public Native_InCounterAttack(Handle:plugin, numParams)
+{
+	return InCounterAttack();
+}
+
 /*public Action Discord_Info(int client, int args)
 {
 	char textToPrint[32];
@@ -1336,6 +1421,8 @@ public Action Command_Respawn(int client, int args)
 		
 	return Plugin_Handled;
 }
+
+
 
 /*Action Timer_EliteBots(Handle Timer)
 {
@@ -3604,7 +3691,8 @@ public Action Event_PlayerHurt_Pre(Event event, const char[] name, bool dontBroa
 
 		// Check is team attack
 		int attackerTeam;
-		if (attacker > 0 && IsClientInGame(attacker) && IsClientConnected(attacker)) {
+		if (attacker > 0 && IsClientInGame(attacker) && IsClientConnected(attacker))
+		{
 			attackerTeam = GetClientTeam(attacker);
 		}
 
@@ -3612,10 +3700,12 @@ public Action Event_PlayerHurt_Pre(Event event, const char[] name, bool dontBroa
 		float fRandom = GetRandomFloat(0.0, 1.0);
 
 		// Is client valid
-		if (IsClientInGame(victim)) {
+		if (IsClientInGame(victim))
+		{
 
 			// Explosive
-			if (hitgroup == 0) {
+			if (hitgroup == 0)
+			{
 				//explosive list
 				//incens
 				//grenade_molotov, grenade_anm14
@@ -3651,9 +3741,11 @@ public Action Event_PlayerHurt_Pre(Event event, const char[] name, bool dontBroa
 				//PrintToServer("[SUICIDE] HITRGOUP 0 [GENERIC]");
 			}
 			// Headshot
-			else if (hitgroup == 1) {
+			else if (hitgroup == 1) 
+			{
 				//PrintToServer("[PLAYER HURT HEAD]");
-				if (dmg_taken >= g_iCvar_fatal_head_dmg && (fRandom <= g_fCvar_fatal_head_chance) && attackerTeam != TEAM_1_SEC) {
+				if (dmg_taken >= g_iCvar_fatal_head_dmg && (fRandom <= g_fCvar_fatal_head_chance) && attackerTeam != TEAM_1_SEC) 
+				{
 					// Hurt fatally
 					g_iHurtFatal[victim] = 1;
 

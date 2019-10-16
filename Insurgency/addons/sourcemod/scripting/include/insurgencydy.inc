@@ -1,13 +1,18 @@
 #if defined _insurgencydy_included
   #endinput
 #endif
-
 #define _insurgencydy_included
+
+//#include <sourcemod>
+//#include <sdktools>
+//#include <loghelper>
 #if defined REQUIRE_PLUGIN
 #undef REQUIRE_PLUGIN
+#include <updater>
 #include <smlib>
 #define REQUIRE_PLUGIN
 #else
+#include <updater>
 #include <smlib>
 #endif
 
@@ -22,7 +27,7 @@
 #define MAX_CLASS_LEN 64
 #define MAX_CONTROLPOINTS 64
 #define PREFIX_LEN 7
-#define MAX_SQUADS 30
+#define MAX_SQUADS 16
 #define SQUAD_SIZE 32
 #define MAX_MAPS 256
 #define MAX_GAMEMODES 32
@@ -245,29 +250,38 @@
 #define		COLOR_WHITESMOKE			"F5F5F5FF"
 #define		COLOR_YELLOW				"FFFF00FF"
 #define		COLOR_YELLOWGREEN			"9ACD32FF"
-native int Ins_ObjectiveResource_GetProp(const char[] prop, int size = 4, int element = 0);
-native int Ins_GetMaxClip1(int weapon);
-native int Ins_GetWeaponGetMaxClip1(int weapon);
-native int Ins_GetDefaultClip1(int weapon);
-native void Ins_DecrementAmmo(int weapon, int value);
-native float Ins_ObjectiveResource_GetPropFloat(const char[] prop, int size = 4, int element = 0);
-native int Ins_ObjectiveResource_GetPropEnt(const char[] prop, int element = 0);
-native bool Ins_ObjectiveResource_GetPropBool(const char[] prop, int element = 0);
-native int Ins_ObjectiveResource_GetPropVector(const char[] prop, float vec[3], int element = 0);
-native int Ins_ObjectiveResource_GetPropString(const char prop, char[] buffer, int maxlen);
-native bool Ins_InCounterAttack();
-native int Ins_GetPlayerScore(int client);
-native int Ins_GetPlayerClass(int client, char[] buffer, int maxlen);
-native void Ins_GetClassName(int squad, int squad_slot);
-native void Ins_GetWeaponName(int weaponid, char[] buffer, int maxlen);
-native int Ins_GetWeaponId(char[] weapon_name);
 
-int StuckCheck[MAXPLAYERS+1] = {0, ...};
-bool isStuck[MAXPLAYERS+1];
 
-float Step;
-float RadiusSize;
-float Ground_Velocity[3] = {0.0, 0.0, -300.0};
+
+native Ins_ObjectiveResource_GetProp(const String:prop[], size=4, element=0);
+//native Ins_Log(ELOG_LEVEL:level,const String:format[], any:...);
+native Ins_GetMaxClip1(weapon);
+native Ins_GetWeaponGetMaxClip1(weapon);
+native Ins_GetDefaultClip1(weapon);
+native Ins_DecrementAmmo(weapon, value);
+//native Ins_AddMags(client, value);
+native Float:Ins_ObjectiveResource_GetPropFloat(const String:prop[], size=4, element=0);
+native Ins_ObjectiveResource_GetPropEnt(const String:prop[], element=0);
+native bool:Ins_ObjectiveResource_GetPropBool(const String:prop[], element=0);
+native Ins_ObjectiveResource_GetPropVector(const String:prop[], Float:vec[3], element=0);
+native Ins_ObjectiveResource_GetPropString(const String:prop[], String:buffer[], maxlen);
+
+native bool:Ins_InCounterAttack();
+
+native Ins_GetPlayerScore(client);
+native Ins_GetPlayerClass(client, String:buffer[], maxlen);
+native Ins_GetClassName(squad,squad_slot);
+//native GameLogic_();
+
+native Ins_GetWeaponName(weaponid, String:buffer[], maxlen);
+native Ins_GetWeaponId(String:weapon_name[]);
+
+new StuckCheck[MAXPLAYERS+1] 	= {0, ...};
+new bool:isStuck[MAXPLAYERS+1];
+
+new Float:Step;
+new Float:RadiusSize;
+new Float:Ground_Velocity[3] = {0.0, 0.0, -300.0};
 
 // Team numbers. This is Insurgency specific right now
 // TODO: Add support for DoI style factions, or make it load from a cfg file
@@ -344,7 +358,7 @@ enum LOG_LEVEL {
 }
 
 // Log level names
-char g_sLogLevel[6][32] = {
+new String:g_sLogLevel[6][32] = {
 	"default",
 	"trace",
 	"debug",
@@ -354,23 +368,21 @@ char g_sLogLevel[6][32] = {
 };
 
 // Global log level variable
-// = sizeof(g_sLogLevel);
-LOG_LEVEL g_iLogLevel;
+new LOG_LEVEL:g_iLogLevel;// = sizeof(g_sLogLevel);
 
 /**
  * Log events to console, based upon level
  *
  * @param level
  */
-stock void InsLog(LOG_LEVEL level, const char[] format, any ...) {
-	if ((level) && (level > g_iLogLevel)) {
+stock InsLog(LOG_LEVEL:level,const String:format[], any:...) 
+{
+	if ((level) && (level > g_iLogLevel))
 		return;
-	}
-	char buffer[512];
-	char sLevel[32];
-	String_ToUpper(g_sLogLevel[level], sLevel, sizeof(sLevel));
+	decl String:buffer[512],String:sLevel[32];
+	String_ToUpper(g_sLogLevel[level],sLevel,sizeof(sLevel));
 	VFormat(buffer, sizeof(buffer), format, 3);
-	PrintToServer("[%s] [%s] %s", PLUGIN_LOG_PREFIX, sLevel, buffer);
+	PrintToServer("[%s] [%s] %s",PLUGIN_LOG_PREFIX,sLevel,buffer);
 }
 
 /**
@@ -378,20 +390,20 @@ stock void InsLog(LOG_LEVEL level, const char[] format, any ...) {
  *
  * @param 
  */
-stock void AddFolderToDownloadTable(const char[] Directory, bool recursive = false) {
-	char FileName[64];
-	char Path[512];
-	DirectoryListing Dir = OpenDirectory(Directory);
-	FileType Type;
-	while (Dir.GetNext(FileName, sizeof(FileName), Type)) {
-		if (Type == FileType_Directory && recursive) {
+stock AddFolderToDownloadTable(const String:Directory[], bool:recursive=false)
+{
+	decl String:FileName[64], String:Path[512];
+	new Handle:Dir = OpenDirectory(Directory), FileType:Type;
+	while(ReadDirEntry(Dir, FileName, sizeof(FileName), Type))
+	{
+		if(Type == FileType_Directory && recursive)
+		{
 			FormatEx(Path, sizeof(Path), "%s/%s", Directory, FileName);
-			AddFolderToDownloadTable(FileName, recursive);
+			AddFolderToDownloadTable(FileName,recursive);
 			continue;
 		}
-		if (Type != FileType_File) {
+		if (Type != FileType_File)
 			continue;
-		}
 		FormatEx(Path, sizeof(Path), "%s/%s", Directory, FileName);
 		AddFileToDownloadsTable(Path);
 	}
@@ -403,11 +415,12 @@ stock void AddFolderToDownloadTable(const char[] Directory, bool recursive = fal
  *
  * @return                  If the client is a valid client.
  */
-stock bool IsValidClient(int client) {
+stock bool:IsValidClient(client) 
+{
 
-	return (client > 0 && client <= MaxClients &&
-		IsClientConnected(client) && IsClientInGame(client) &&
-		!IsClientReplay(client) && !IsClientSourceTV(client));
+  return (client > 0 && client <= MaxClients &&
+    IsClientConnected(client) && IsClientInGame(client) &&
+    !IsClientReplay(client) && !IsClientSourceTV(client));
 
 }
 
@@ -417,17 +430,20 @@ stock bool IsValidClient(int client) {
  * @param team             Team index.
  * @return                 Number of players.
  */
-stock int Team_CountPlayers(int team) {
-	int count = 0;
-	for (int i = 1; i <= MaxClients; i++) {
-		if (IsValidClient(i) && GetClientTeam(i) == team) {
-		  count++;
-		}
-	}
-	return count;
+stock Team_CountPlayers(team) 
+{
+
+  new count = 0;
+  for (new i = 1; i <= MaxClients; i++) 
+  {
+    if (IsValidClient(i) && GetClientTeam(i) == team) 
+    {
+      count++;
+    }
+  }
+  return count;
 
 }
-
 
 /**
  * Counts the number of living players in a team.
@@ -435,19 +451,22 @@ stock int Team_CountPlayers(int team) {
  * @param team             Team index.
  * @return                 Number of living players.
  */
-stock int Team_CountAlivePlayers(int team) {
-
-	int count = 0;
-	for (int i = 1; i <= MaxClients; i++) {
-		if (IsValidClient(i) && GetClientTeam(i) == team && IsPlayerAlive(i)) {
-			count++;
-		}
-	}
-	return count;
+stock Team_CountAlivePlayers(team) 
+{
+   new count = 0;
+   for (new i = 1; i <= MaxClients; i++) 
+   {
+     if (IsValidClient(i) && GetClientTeam(i) == team && IsPlayerAlive(i)) 
+     {
+       count++;
+     }
+   }
+   return count;
 
  }
 /*
-stock Client_IsValid(int client, bool checkConnected) {
+stock Client_IsValid(client, bool:checkConnected)
+{
 	if (client > 4096) {
 		client = EntRefToEntIndex(client);
 	}
@@ -459,7 +478,7 @@ stock Client_IsValid(int client, bool checkConnected) {
 	if (checkConnected && !IsClientConnected(client)) {
 		return false;
 	}
-
+	
 	return true;
 }
 */
@@ -469,10 +488,11 @@ stock Client_IsValid(int client, bool checkConnected) {
  *
  * @param 
  */
-stock bool ClientCanSeeClient(int client, int target, float distance = 0.0, float height = 50.0) {
-	float vTargetPosition[3];
+stock bool:ClientCanSeeClient(client, target, Float:distance = 0.0, Float:height = 50.0) 
+{
+	new Float:vTargetPosition[3];
 	GetEntPropVector(target, Prop_Send, "m_vecOrigin", vTargetPosition);
-	return ClientCanSeeVector(client, targetpos, distance, height);
+	return ClientCanSeeVector(client,targetpos,distance,height);
 }
 
 /**
@@ -480,51 +500,55 @@ stock bool ClientCanSeeClient(int client, int target, float distance = 0.0, floa
  *
  * @param 
  */
-stock bool ClientCanSeeVector(int client, float vTargetPosition[3], float distance = 0.0, float height = 50.0) {
+stock bool:ClientCanSeeVector(client, Float:vTargetPosition[3], Float:distance = 0.0, Float:height = 50.0) 
+{ 
+        new Float:vClientPosition[3];
+         
+        GetEntPropVector(client, Prop_Send, "m_vecOrigin", vClientPosition); 
+        vClientPosition[2] += height; 
+         
+        if (distance == 0.0 || GetVectorDistance(vClientPosition, vTargetPosition, false) < distance) 
+        { 
+            new Handle:trace = TR_TraceRayFilterEx(vClientPosition, vTargetPosition, MASK_SOLID_BRUSHONLY, RayType_EndPoint, Base_TraceFilter); 
 
-	float vClientPosition[3];
+            if(TR_DidHit(trace)) 
+            { 
+                CloseHandle(trace); 
+                return (false); 
+            } 
+             
+            CloseHandle(trace); 
 
-	GetEntPropVector(client, Prop_Send, "m_vecOrigin", vClientPosition);
-	vClientPosition[2] += height;
-
-	if (distance == 0.0 || GetVectorDistance(vClientPosition, vTargetPosition, false) < distance) {
-		Handle trace = TR_TraceRayFilterEx(vClientPosition, vTargetPosition, MASK_SOLID_BRUSHONLY, RayType_EndPoint, Base_TraceFilter);
-
-		if (TR_DidHit(trace)) {
-			delete trace;
-			return (false);
-		}
-
-		delete trace;
-
-		return (true);
-	}
-	return false;
-}
-
-/**
- * 
- *
- * @param 
- */
-public bool Base_TraceFilter(int entity, int contentsMask, any data) {
-	if (entity != data)
-		return (false);
-
-	return (true);
-}
+            return (true); 
+        } 
+        return false; 
+} 
 
 /**
  * 
  *
  * @param 
  */
-stock bool IsClientInSightRange(int client, int target, float angle = 90.0, float distance = 0.0, bool heightcheck = true, bool negativeangle = false) {
-	float targetpos[3];
-//	if (!isClientConnectedIngameAlive(target))
+public bool:Base_TraceFilter(entity, contentsMask, any:data) 
+{ 
+    if(entity != data) 
+        return (false); 
+
+    return (true); 
+}  
+
+/**
+ * 
+ *
+ * @param 
+ */
+stock bool:IsClientInSightRange(client, target, Float:angle=90.0, Float:distance=0.0, bool:heightcheck=true, bool:negativeangle=false) 
+{
+	new Float:targetpos[3];
+//	if(!isClientConnectedIngameAlive(target))
 //		ThrowError("Target is not Alive.");
 	GetClientAbsOrigin(target, targetpos);
-	return IsVectorInSightRange(client, targetpos, angle, distance, heightcheck, negativeangle);
+	return IsVectorInSightRange(client,targetpos,angle,distance,heightcheck,negativeangle);
 }
 
 /**
@@ -532,56 +556,47 @@ stock bool IsClientInSightRange(int client, int target, float angle = 90.0, floa
  *
  * @param 
  */
-stock bool IsVectorInSightRange(int client, float targetpos[3], float angle = 90.0, float distance = 0.0, bool heightcheck = true, bool negativeangle = false) {
-	if (angle > 360.0 || angle < 0.0) {
+stock bool:IsVectorInSightRange(client, Float:targetpos[3], Float:angle=90.0, Float:distance=0.0, bool:heightcheck=true, bool:negativeangle=false) 
+{
+	if(angle > 360.0 || angle < 0.0)
 		ThrowError("Angle Max : 360 & Min : 0. %d isn't proper angle.", angle);
-	}
-//	if (!isClientConnectedIngameAlive(client))
+//	if(!isClientConnectedIngameAlive(client))
 //		ThrowError("Client is not Alive.");
-
-	float clientpos[3];
-	float anglevector[3];
-	float targetvector[3];
-	float resultangle;
-	float resultdistance;
-
+		
+	decl Float:clientpos[3], Float:anglevector[3], Float:targetvector[3], Float:resultangle, Float:resultdistance;
+	
 	GetClientEyeAngles(client, anglevector);
 	anglevector[0] = anglevector[2] = 0.0;
 	GetAngleVectors(anglevector, anglevector, NULL_VECTOR, NULL_VECTOR);
 	NormalizeVector(anglevector, anglevector);
-	if (negativeangle) {
+	if(negativeangle)
 		NegateVector(anglevector);
-	}
 
 	GetClientAbsOrigin(client, clientpos);
-	if (heightcheck && distance > 0) {
+	if(heightcheck && distance > 0)
 		resultdistance = GetVectorDistance(clientpos, targetpos);
-	}
 	clientpos[2] = targetpos[2] = 0.0;
 	MakeVectorFromPoints(clientpos, targetpos, targetvector);
 	NormalizeVector(targetvector, targetvector);
-
+	
 	resultangle = RadToDeg(ArcCosine(GetVectorDotProduct(targetvector, anglevector)));
-
-	if (resultangle <= angle/2) {
-		if (distance > 0) {
-			if (!heightcheck) {
+	
+	if(resultangle <= angle/2)	
+	{
+		if(distance > 0)
+		{
+			if(!heightcheck)
 				resultdistance = GetVectorDistance(clientpos, targetpos);
-			}
-			if (distance >= resultdistance) {
+			if(distance >= resultdistance)
 				return true;
-			}
-			else {
+			else
 				return false;
-			}
 		}
-		else {
+		else
 			return true;
-		}
 	}
-	else {
+	else
 		return false;
-	}
 }
 
 /**
@@ -589,38 +604,40 @@ stock bool IsVectorInSightRange(int client, float targetpos[3], float angle = 90
  *
  * @param 
  */
-stock int GetSendProp(const char[] sNetClass, const char[] sPropName, int iFail = 1) {
+stock GetSendProp(const String:sNetClass[], const String:sPropName[], iFail=1) 
+{
 	int m_iProp = FindSendPropInfo(sNetClass, sPropName);
-	if (iFail) {
-		if (m_iProp == -1) {
-			LogError("Can't find %s::%s", sNetClass, sPropName);
-		}
-	}
+	if (iFail) 
+	{
+	       	if (m_iProp == -1) 
+	       	{
+        	       	LogError("Can't find %s::%s", sNetClass, sPropName);
+	        }
+        }
 	return m_iProp;
 }
 
 
 //Get and Set Ammo for storing weapons and ammo on death (reference weapon to make sure it exists)
-stock int GetWeaponAmmo(int client, int weapon, int type) {
-	PropType proptype = Prop_Data;
-	int ammoOffset = FindSendPropInfo("CINSPlayer", "m_iAmmo");
-	int m_iPrimaryAmmoType;
-	int ammo;
-
-
+stock GetWeaponAmmo(client, weapon, type)
+{
+	new PropType:proptype = Prop_Data;
+	new ammoOffset = FindSendPropInfo("CINSPlayer", "m_iAmmo");
+	new m_iPrimaryAmmoType, ammo;
+	
 	//return GetEntData(client, ammoOffset+(slot*4));
-	// primary
-	if (type == 0)  {
+	if (type == 0) // primary
+	{
 		m_iPrimaryAmmoType = GetEntProp(weapon, proptype, "m_iPrimaryAmmoType");
 		ammo = GetEntProp(client, proptype, "m_iAmmo", _, m_iPrimaryAmmoType);
 	}
-	// secondary
-	else if (type == 1)  {
+	else if(type == 1) // secondary
+	{
 		m_iPrimaryAmmoType = GetEntProp(weapon, proptype, "m_iSecondaryAmmoType");
 		ammo = GetEntProp(client, proptype, "m_iAmmo", _, m_iPrimaryAmmoType);
 	}
-	// grenades
-	else if (type == 3)  {
+	else if (type == 3) // grenades
+	{	
 		m_iPrimaryAmmoType = GetEntProp(weapon, proptype, "m_iPrimaryAmmoType");
 		//PrintToServer("m_iPrimaryAmmoType %d", m_iPrimaryAmmoType);
 		ammo = GetEntProp(client, proptype, "m_iAmmo", _, m_iPrimaryAmmoType);
@@ -629,55 +646,64 @@ stock int GetWeaponAmmo(int client, int weapon, int type) {
 	return ammo;
 }
 
-stock void SetWeaponAmmo(int client, int weapon, int ammo, int type) {
-	PropType proptype = Prop_Send;
+stock SetWeaponAmmo(client, weapon, ammo, type)
+{
+	new PropType:proptype = Prop_Send;
 	//new ammoOffset = FindSendPropInfo("CBasePlayer", "m_iAmmo");
-	int m_ammoType;
+	new m_ammoType;
 
 	//return GetEntData(client, ammoOffset+(slot*4));
-	// primary
-	if (type == 0)  {
+	if (type == 0) // primary
+	{
 		m_ammoType = GetEntProp(weapon, proptype, "m_iPrimaryAmmoType");
 
 		//PrintToServer("ammoOffset: %i, m_ammoType %i", ammoOffset, m_ammoType);
 		SetEntProp(client, proptype, "m_iAmmo", ammo, _, m_ammoType);
 	}
-	// secondary
-	else if (type == 1)  {
+	else if(type == 1) // secondary
+	{
 		m_ammoType = GetEntProp(weapon, proptype, "m_iSecondaryAmmoType");
 		SetEntProp(client, proptype, "m_iAmmo", ammo, _, m_ammoType);
 	}
-	// grenades
-	else if (type == 3)  {
+	else if (type == 3) // grenades
+	{	
 
 	}
 }
 
 //Get / Set primary ammo count as it was when died
-stock int GetPrimaryAmmo(int client, int weap, int type) {
+stock GetPrimaryAmmo(client, weap, type)
+{
 	//new myweapons = FindSendPropInfo("CCSPlayer", "m_hMyWeapons");
 	//new weap = GetEntDataEnt2(client, myweapons+ (slot*4));
-	if (IsValidEntity(weap)) {
-		if (type == 0) {
+	if(IsValidEntity(weap))
+	{
+		if (type==0)
+		{
 			return GetEntData(weap, FindSendPropInfo("CBaseCombatWeapon", "m_iClip1"));
 		}
-		else if (type == 1) {
+		else if (type==1)
+		{
 			return GetEntData(weap, FindSendPropInfo("CBaseCombatWeapon", "m_iClip2"));
 		}
 	}
 	return 0;
 }
 
-stock void SetPrimaryAmmo(int client, int weap, int ammo, int type) {
-	//PropType proptype = Prop_Data;
+stock void SetPrimaryAmmo(int client, int weap, int ammo, int type)
+{
+	//new PropType:proptype = Prop_Data;
 	//new myweapons = FindSendPropInfo("CCSPlayer", "m_hMyWeapons");
 	//new weap = GetEntDataEnt2(client, myweapons+ (slot*4));
-	if (IsValidEntity(weap)) {
-		if (type == 0) {
+	if(IsValidEntity(weap))
+	{
+		if (type==0)
+		{
 			SetEntData(weap, FindSendPropInfo("CBaseCombatWeapon", "m_iClip1"), ammo, _, true);
 			return;
 		}
-		else if (type == 1) {
+		else if (type==1)
+		{
 			SetEntData(weap, FindSendPropInfo("CBaseCombatWeapon", "m_iClip2"), ammo, _, true);
 			return;
 		}
@@ -685,16 +711,18 @@ stock void SetPrimaryAmmo(int client, int weap, int ammo, int type) {
 }
 
 
-stock int GetGrenadeAmmo(int client, int grenadeType) {
-	PropType proptype = Prop_Data;
-	int ammo;
+stock GetGrenadeAmmo(client, grenadeType)
+{
+	new PropType:proptype = Prop_Data;
+	new ammo;
 	////PrintToServer("grenadeType %d", grenadeType);
 	ammo = GetEntProp(client, proptype, "m_iAmmo", _, grenadeType);
 	return ammo;
 }
 
-stock void SetGrenadeAmmo(int client, int grenadeType, int grenadeAmount) {
-	PropType proptype = Prop_Data;
+stock SetGrenadeAmmo(client, grenadeType, grenadeAmount)
+{
+	new PropType:proptype = Prop_Data;
 	//PrintToServer("grenadeType %d, amount to set: %d", grenadeType, grenadeAmount);
 	SetEntProp(client, proptype, "m_iAmmo", grenadeAmount, _, grenadeType);
 }
@@ -722,16 +750,17 @@ stock void SetGrenadeAmmo(int client, int grenadeType, int grenadeAmount) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-stock void StartStuckDetection(int client) {
-	StuckCheck[client]++;
-	isStuck[client] = false;
-	//CheckIfPlayerCanMove(client, 0, 500.0, 0.0, 0.0);
-	// Check if player stuck in prop
-	isStuck[client] = CheckIfPlayerIsStuck(client);
-	if (isStuck[client]) {
+stock StartStuckDetection(iClient)
+{
+	StuckCheck[iClient]++;
+	isStuck[iClient] = false;
+	//CheckIfPlayerCanMove(iClient, 0, 500.0, 0.0, 0.0);
+	isStuck[iClient] = CheckIfPlayerIsStuck(iClient); // Check if player stuck in prop
+	if (isStuck[iClient])
+	{
 		//Can't fix
-		//ForcePlayerSuicide(client);
-		//AddLifeForStaticKilling(client);
+		//ForcePlayerSuicide(iClient);
+		//AddLifeForStaticKilling(iClient);	
 	}
 }
 
@@ -741,22 +770,19 @@ stock void StartStuckDetection(int client) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-stock bool CheckIfPlayerIsStuck(int client) {
-	float vecMin[3];
-	float vecMax[3];
-	float vecOrigin[3];
-
-	GetClientMins(client, vecMin);
-	GetClientMaxs(client, vecMax);
-	GetClientAbsOrigin(client, vecOrigin);
-
+stock bool:CheckIfPlayerIsStuck(iClient)
+{
+	decl Float:vecMin[3], Float:vecMax[3], Float:vecOrigin[3];	
+	GetClientMins(iClient, vecMin);
+	GetClientMaxs(iClient, vecMax);
+	GetClientAbsOrigin(iClient, vecOrigin);
 	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_SOLID, TraceEntityFilterSolid);
-	// head in wall ?
-	return TR_DidHit();
+	return TR_DidHit();	// head in wall ?
 }
 
 
-public bool TraceEntityFilterSolid(int entity, int contentsMask) {
+public bool:TraceEntityFilterSolid(entity, contentsMask) 
+{
 	return entity > 1;
 }
 
@@ -767,39 +793,36 @@ public bool TraceEntityFilterSolid(int entity, int contentsMask) {
 
 
 
-bool TryFixPosition(int client, float Radius, float pos_Z) {
-	float DegreeAngle;
-	float vecPosition[3];
-	float vecOrigin[3];
-	float vecAngle[3];
-
-	GetClientAbsOrigin(client, vecOrigin);
-	GetClientEyeAngles(client, vecAngle);
+bool:TryFixPosition(iClient, Float:Radius, Float:pos_Z)
+{
+	decl Float:DegreeAngle;
+	decl Float:vecPosition[3];
+	decl Float:vecOrigin[3];
+	decl Float:vecAngle[3];
+	
+	GetClientAbsOrigin(iClient, vecOrigin);
+	GetClientEyeAngles(iClient, vecAngle);
 	vecPosition[2] = vecOrigin[2] + pos_Z;
 
 	DegreeAngle = -180.0;
-	while (DegreeAngle < 180.0) {
-		// convert angle in radian
-		vecPosition[0] = vecOrigin[0] + Radius * Cosine(DegreeAngle * FLOAT_PI / 180);
+	while(DegreeAngle < 180.0)
+	{
+		vecPosition[0] = vecOrigin[0] + Radius * Cosine(DegreeAngle * FLOAT_PI / 180); // convert angle in radian
 		vecPosition[1] = vecOrigin[1] + Radius * Sine(DegreeAngle * FLOAT_PI / 180);
-
-		TeleportEntity(client, vecPosition, vecAngle, Ground_Velocity);
-		if (!CheckIfPlayerIsStuck(client)) {
+		
+		TeleportEntity(iClient, vecPosition, vecAngle, Ground_Velocity);
+		if(!CheckIfPlayerIsStuck(iClient))
 			return true;
-		}
-
-		// + 10°
-		DegreeAngle += 10.0;
+		
+		DegreeAngle += 10.0; // + 10°
 	}
-
-	TeleportEntity(client, vecOrigin, vecAngle, Ground_Velocity);
-	if (Radius <= RadiusSize) {
-		return TryFixPosition(client, Radius + Step, pos_Z);
-	}
-
+	
+	TeleportEntity(iClient, vecOrigin, vecAngle, Ground_Velocity);
+	if(Radius <= RadiusSize)
+		return TryFixPosition(iClient, Radius + Step, pos_Z);
+	
 	return false;
 }
-
 
 
 
@@ -809,23 +832,26 @@ bool TryFixPosition(int client, float Radius, float pos_Z) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-stock bool ChangePlayerWeaponSlot(int client, int iSlot) {
-	int iWeapon = GetPlayerWeaponSlot(client, iSlot);
-	if (iWeapon > MaxClients) {
-		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
-		return true;
-	}
+stock bool:ChangePlayerWeaponSlot(iClient, iSlot) 
+{
+    new iWeapon = GetPlayerWeaponSlot(iClient, iSlot);
+    if (iWeapon > MaxClients) {
+        SetEntPropEnt(iClient, Prop_Send, "m_hActiveWeapon", iWeapon);
+        return true;
+    }
 
-	return false;
-}
+    return false;
+}  
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //									Scream Nades START
 //									Scream Nades START
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-stock void PlayerGrenadeScreamRand(int client) {
-	switch(GetRandomInt(1, 14)) {
+stock PlayerGrenadeScreamRand(client)
+{
+	switch(GetRandomInt(1, 14))
+	{
 		case 1: EmitSoundToAll("player/voice/botsurvival/leader/incominggrenade9.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
 		case 2: EmitSoundToAll("player/voice/botsurvival/subordinate/incominggrenade9.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
 		case 3: EmitSoundToAll("player/voice/botsurvival/leader/incominggrenade4.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
@@ -843,10 +869,12 @@ stock void PlayerGrenadeScreamRand(int client) {
 	}
 }
 
-stock void PlayerFireScreamRand(int client) {
+stock PlayerFireScreamRand(client)
+{
 	//PrintToServer("SCREAM FIRE");
-
-	switch(GetRandomInt(1, 5)) {
+	
+	switch(GetRandomInt(1, 5))
+	{
 		case 1: EmitSoundToAll("player/voice/responses/security/subordinate/damage/molotov_incendiary_detonated7.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
 		case 2: EmitSoundToAll("player/voice/responses/security/leader/damage/molotov_incendiary_detonated6.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
 		case 3: EmitSoundToAll("player/voice/responses/security/subordinate/damage/molotov_incendiary_detonated6.ogg", client, SNDCHAN_VOICE, _, _, 1.0);
@@ -924,4 +952,14 @@ stock void DisplayInstructorHint(int iTargetEntity, float fTime, float fHeight, 
 	
 	DispatchSpawn(iEntity);
 	AcceptEntityInput(iEntity, "ShowHint");
+}
+
+//Check Min/Max AD
+stock AI_Director_SetMinMax(t_AIDir_TeamStatus, t_AIDir_TeamStatus_min, t_AIDir_TeamStatus_max)
+{
+	if (t_AIDir_TeamStatus < t_AIDir_TeamStatus_min)
+	t_AIDir_TeamStatus = t_AIDir_TeamStatus_min;
+	else if (t_AIDir_TeamStatus > t_AIDir_TeamStatus_max)
+	t_AIDir_TeamStatus = t_AIDir_TeamStatus_max;
+	return t_AIDir_TeamStatus;
 }
