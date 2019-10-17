@@ -28,7 +28,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
-#include <insurgency2>
+#include <insurgencydy>
 #include <smlib>
 #define REQUIRE_EXTENSIONS
 

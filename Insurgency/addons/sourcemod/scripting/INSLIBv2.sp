@@ -23,15 +23,17 @@ For best effort support, feedback etc, reach out to Ozzy or Bot Chris at the SOC
 Ozzy Github - https://github.com/ozzygit/Insurgency_Sourcemod
 */
 
-#include <insurgency2>
+#define PLUGIN_LOG_PREFIX "INSLIB"
+#include <insurgencydy>
 #include <sourcemod>
 #pragma semicolon 1
 #pragma newdecls required
 #define PLUGIN_NAME "[INS] Insurgency Support Library v2"
 #define PLUGIN_AUTHOR "Bot Chris and [SOC] Ozzy. New Syntax by clug"
 #define PLUGIN_DESCRIPTION "Insurgency support library required for some custom plugins.  Credits to JBallou and Daimyo81 for previous similar version."
-#define PLUGIN_VERSION "2"
+#define PLUGIN_VERSION "2.0"
 #define PLUGIN_WORKING "1"
+
 
 public Plugin myinfo =
 {
