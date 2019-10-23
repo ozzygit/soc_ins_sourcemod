@@ -1,30 +1,17 @@
-//CONFIRMED GOOD MAPS - May contain small console errors
+//CUSTOM MAPS
 amber_spirits_coop checkpoint
 angle_iron_coop_ws checkpoint
 badlands_b1 checkpoint // minor texture issues
 baghdad_coop_b5 checkpoint
 baghdad_surge checkpoint
 bastion_coop checkpoint
-block26_b1 checkpoint
 block_party_coop_ws checkpoint
-//christmas_house_coop checkpoint
+block26_b1 checkpoint
 clean_sweep_coop_beta3 checkpoint
 congress_coop checkpoint
 convoy_coopv1 checkpoint
-cs_agency_ins_b2 checkpoint
-cs_downtown_coop checkpoint
-cs_havana_ins_b2 checkpoint
-cs_militia_coop_v1_1
-cs_motel_coop_nd_v1_3 checkpoint
-//cs_italy_coop checkpoint
-cs_office_coop_b2 checkpoint
-cs_workout_v1 checkpoint
 cutoff4-9 checkpoint
-de_prodigy_coop checkpoint
-//de_train_csgo_pb2 checkpoint
-de_vertigo_coop checkpoint
 desert_hell_coop_remix checkpoint
-//Docks_coopb2_day checkpoint
 downtown_coopv1a checkpoint
 dusty_anguish_coopv1_1 checkpoint
 fa-allinclusive_coop_v6
@@ -32,8 +19,6 @@ fortress_coop_ws checkpoint
 game_day_coop_ws checkpoint
 gizab_b1_coop checkpoint
 haditha_dam_coop_finale checkpoint
-inferno_checkpoint_b2 checkpoint
-//ins_panzer_tag
 ins_bridgeatremagen_coop
 invasion_coop_ws checkpoint
 isis_laststand checkpoint
@@ -47,7 +32,6 @@ l4d_ga_b2_day checkpoint
 l4d_garage_lots_day checkpoint
 launch_control_coop_ws checkpoint
 miransh_alpha checkpoint
-//oms_corridor_coopb3 checkpoint
 osama_b3_checkpoint checkpoint
 panama_canal_b2 checkpoint
 point_blank_fix checkpoint
@@ -58,59 +42,80 @@ takbar_b6 checkpoint
 tet_b1 checkpoint
 the_burbs_coop checkpoint
 troopers_karbala_2019 checkpoint
-warehouse_coopv3b4 checkpoint
+winter_rescuefix checkpoint
 zagros_convoy_b5 checkpoint
 
+//Stock Maps Restored
+buhriz_coop checkpoint
+district_coop checkpoint
+embassy_coop checkpoint
+heights_coop checkpoint
+market_coop checkpoint
+ministry_coop checkpoint
+revolt_coop checkpoint
+siege_coop checkpoint
+sinjar_coop checkpoint
+tell_coop checkpoint
+verticality_coop checkpoint
+
 //RETIRED MAPS
-//bb_river_coop_ws checkpoint - don't like it and bad texture placements
-//hurtlocker old and mines
-//payback checkpoint - kicks players
-//haditha // insurgency crashes
-//tet - crashes insurgency
-//healthcenter_coop checkpoint //theater texture issues in this map
-//the_raid_coop_ws checkpoint // loads as firefight - theater doesn't load properly
-//tunnel_rats_coop_ws checkpoint - server crashed during play
-//abdallah_b1 checkpoint //lagged map
-//mountain_lake_coopv1_1 checkpoint - crashed server
-//depot_coop
-//c7m1_docks - texture issue
-//ikazuchi_jungle_coop_b3
-//dust2_checkpoint_b8 - crashes server
-//ins_bridgeatremagen_coop - unpopular - ppl ragequit
-//facilityb2_coop_v1_1 checkpoint
-//pipeline_coop checkpoint
-//verticality_coop checkpoint
-//warehouse_coopv2u1
-//winter_rescue_v1 checkpoint
-//ps7_co_b91 checkpoint
-//revolt_coop checkpoint
-//siege_coop checkpoint
-//sinjar_coop checkpoint
-//tell_coop checkpoint
-//almaden_b3 checkpoint
-//buhriz_coop checkpoint
-//district_coop checkpoint
-//estates_b4 checkpoint
-//frequency_coop checkpoint
-//gizab_b1_coop checkpoint - unpopular
-//heights_coop checkpoint
-//market_coop checkpoint
-//nomercy_coopv1 checkpoint
-//osama_b3_checkpoint checkpoint
-//embassy_coop checkpoint
-//operator_range_checkpoint
-//prospect_coop_b6 checkpoint
+//abdallah_b1
+//almaden_b3
 //bb_arena_coop_final
-//bb_lighthouse_gold checkpoint
-//bb_maya_beta5 checkpoint
-//bridge_coop_optimized_v1 checkpoint
+//bb_lighthouse_gold
+//bb_maya_beta5
+//bb_river_coop_ws
+//bridge_coop_optimized_v1
+//buhriz_coop
+//c7m1_docks
 //cargo_redux9
-//chateau_tunnels_v2 checkpoint
-//clean_sweep_coop_ws checkpoint
+//chateau_tunnels_v2
+//christmas_house_coop checkpoint
+//clean_sweep_coop_ws
+//cs_agency_ins_b2 checkpoint
+//cs_downtown_coop checkpoint
+//cs_havana_ins_b2 checkpoint
+//cs_italy_coop checkpoint
+//cs_militia_coop_v1_1
+//cs_motel_coop_nd_v1_3 checkpoint
+//cs_office_coop_b2
 //cs_office_coop_b2 checkpoint
-//de_aztec_coop checkpoint
-//glycencity checkpoint
-//ins_chinatown checkpoint
+//cs_workout_v1 checkpoint
+//de_aztec_coop
+//de_prodigy_coop checkpoint
+//de_train_csgo_pb2 checkpoint
+//de_vertigo_coop checkpoint
+//depot_coop
+//district_coop
+//Docks_coopb2_day checkpoint
+//dust2_checkpoint_b8
+//estates_b4
+//facilityb2_coop_v1_1
+//frequency_coop
+//gizab_b1_coop
+//glycencity
+//healthcenter_coop
+//heights_coop
+//hurtlocker
+//ikazuchi_jungle_coop_b3
+//inferno_checkpoint_b2 checkpoint
+//ins_chinatown
+//ins_panzer_tag
 //ins_subway_b4_coop
-//nova_prospect checkpoint
-//vietnam_b2 checkpoint
+//mountain_lake_coopv1_1
+//nomercy_coopv1
+//nova_prospect
+//oms_corridor_coopb3 checkpoint
+//operator_range_checkpoint
+//osama_b3_checkpoint
+//payback
+//pipeline_coop
+//prospect_coop_b6
+//ps7_co_b91
+//tet
+//the_raid_coop_ws
+//tunnel_rats_coop_ws
+//verticality_coop
+//vietnam_b2
+//warehouse_coopv2u1
+//warehouse_coopv3b4 checkpoint
