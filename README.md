@@ -14,7 +14,7 @@ Due to request I'll start providing information here with the plugins I use.
 This is a WIP so please bare with me.
 
 ### Plugins ###
-[Insurgency Library v2](#Goto-"Insurgency Library v2")
+[Insurgency Library v2](#Goto insurgency-library-v2)
 
 [Ozzy Respawn Plugin 4.6](#Goto-"Ozzy Respawn Plugin 4.6")
 
