@@ -9,4 +9,4 @@ Insurgency Library v2
 This is the library originally developed by JBallou and updated by Bot Chris and Ozzy
 
 Files required:
-(Insurgency/addons/sourcemod/plugins/INSLIBv2.smx)
+[inslibv2.smx](Insurgency/addons/sourcemod/plugins/INSLIBv2.smx)
