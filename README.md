@@ -16,15 +16,15 @@ This is a WIP so please bare with me.
 ### Plugins ###
 [Insurgency Library v2](#insurgency-library-v2)
 
-[Ozzy Respawn Plugin 4.6](#Goto-"Ozzy Respawn Plugin 4.6")
+[Ozzy Respawn Plugin 4.6](#Ozzy-Respawn-Plugin-4.6)
 
-[Ozzy Round End Block](#Goto-"Ozzy Round End Block")
+[Ozzy Round End Block](#Ozzy-Round-End-Block)
 
-[Ozzy Med Pack](#Goto-"Ozzy Med Pack")
+[Ozzy Med Pack](#Ozzy-Med-Pack)
 
-[Coop Lobby Override 1.0.0](#Goto-"Coop Lobby Override 1.0.0")
+[Coop Lobby Override 1.0.0](#Coop-Lobby-Override-1.0.0")
 
-[Restricted Area Removal 1.0.0](#Goto-"Restricted Area Removal 1.0.0")
+[Restricted Area Removal 1.0.0](#Restricted-Area-Removal-1.0.0")
 
 
 
