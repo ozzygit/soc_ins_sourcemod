@@ -26,6 +26,11 @@ This is a WIP so please bare with me.
 
 [Restricted Area Removal 1.0.0](#restricted-area-removal-100)
 
+[Bot Names 1.0.5](#bot-names-105)
+
+[SendToSpec](#sendtospec)
+
+[Spawn Protection](#spawnprotection)
 
 
 #### Insurgency Library v2 ####
@@ -54,14 +59,52 @@ They also have a git at https://github.com/bcserv/smlib
 
 #### Ozzy Respawn Plugin 4.6 ####
 
-
 #### Ozzy Round End Block ####
-
 
 #### Ozzy Med Pack ####
 
-
 #### Coop Lobby Override 1.0.0 ####
 
-
 #### Restricted Area Removal 1.0.0 ####
+
+#### Bot Names 1.0.5 ####
+
+#### SendToSpec ####
+
+#### Spawn Protection ####
+
+#### Advertisements ####
+
+#### Afk Manager v4 ####
+
+#### Suicide Bomber Plugin ####
+
+#### Allow Bullets on Cache ####
+
+#### Reserve Slots (Daimyo21) ####
+
+#### Country Announce ####
+
+#### Country Filter ####
+
+#### Pull Rag ####
+
+#### Discord ####
+
+#### Discord Chat ####
+
+#### Dynamic ####
+
+#### Fuck Yeah ####
+
+#### Ban Disconnected Player ####
+
+#### Aim Bot ####
+
+#### Join Messages ####
+
+#### Log Connections ####
+
+#### !Stuck ####
+
+#### VBPing ####
