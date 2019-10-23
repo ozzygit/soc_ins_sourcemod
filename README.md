@@ -1,25 +1,30 @@
 ## SOC Sourcemod Repository
-Sourcemod Plugins for SOC servers. Credit to JBallou and Daimyo21 for their work.
+Sourcemod Plugins for SOC servers.
+
+Credit to JBallou and Daimyo21 for their work.
+
 Credit to others in the community, Circleus, JustSenses, Fishy!, asherkin, 404UNF, .Pilo and clug
+
 I know there's others and I apologise if I left anyone out. It's not intended. Let me know and I'll list you!
 
 Most important credit is to Slugz who introduced me to running Insurgency servers, addons etc. None of this would be here if it wasn't for him.
 
-Due to request I'll start providing information here with the plugins I use
-This is a WIP so please bare with me. Ozzy.
+Due to request I'll start providing information here with the plugins I use.
+
+This is a WIP so please bare with me.
 
 ### Plugins ###
-[Insurgency Library v2](Goto "Insurgency Library v2")
+[Insurgency Library v2](#Goto-"Insurgency Library v2")
 
-[Ozzy Respawn Plugin 4.6](Goto "Ozzy Respawn Plugin 4.6")
+[Ozzy Respawn Plugin 4.6](#Goto-"Ozzy Respawn Plugin 4.6")
 
-[Ozzy Round End Block](Goto "Ozzy Round End Block")
+[Ozzy Round End Block](#Goto-"Ozzy Round End Block")
 
-[Ozzy Med Pack](Goto "Ozzy Med Pack")
+[Ozzy Med Pack](#Goto-"Ozzy Med Pack")
 
-[Coop Lobby Override 1.0.0](Goto "Coop Lobby Override 1.0.0")
+[Coop Lobby Override 1.0.0](#Goto-"Coop Lobby Override 1.0.0")
 
-[Restricted Area Removal 1.0.0](Goto "Restricted Area Removal 1.0.0")
+[Restricted Area Removal 1.0.0](#Goto-"Restricted Area Removal 1.0.0")
 
 
 
