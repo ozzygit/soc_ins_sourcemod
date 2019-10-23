@@ -10,10 +10,19 @@ This is the library originally developed by JBallou and updated by Bot Chris and
 
 Files required:
 
-Plugin
+__Plugin__
 
-[INSLIBv2.smx](Insurgency/addons/sourcemod/plugins/INSLIBv2.smx)
+* [INSLIBv2.smx](Insurgency/addons/sourcemod/plugins/INSLIBv2.smx)
 
-Include
+__Include__
 
-[insurgencydy.inc](Insurgency/addons/sourcemod/scripting/include/insurgencydy.inc)
+* [insurgencydy.inc](Insurgency/addons/sourcemod/scripting/include/insurgencydy.inc)
+* [smlib.inc](Insurgency/addons/sourcemod/scripting/include/smlib.inc) (See SMLIB below)
+
+__Dependency:__
+
+This also requires the [SMLIB](Insurgency/addons/sourcemod/scripting/include/SMLIB) Library
+
+The post in alliedmods.net is https://forums.alliedmods.net/showthread.php?t=148387
+
+They also have a git at https://github.com/bcserv/smlib
