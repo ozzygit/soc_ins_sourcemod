@@ -1,7 +1,7 @@
 /**
  * gameME Plugin - Raw Messages Interface
  * http://www.gameme.com
- * Copyright (C) 2007-2018 TTS Oetzel & Goerz GmbH
+ * Copyright (C) 2007-2020 TTS Oetzel & Goerz GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -68,7 +68,7 @@ public OnClientPutInServer(client)
 }
 
 
-public QuerygameMEStatsCallback(command, payload, client, &Handle: datapack)
+public Action: QuerygameMEStatsCallback(int command, int payload, int client, Handle datapack)
 {
 	if ((client > 0) && (command == RAW_MESSAGE_CALLBACK_PLAYER)) {
 
@@ -120,11 +120,15 @@ public QuerygameMEStatsCallback(command, payload, client, &Handle: datapack)
 		// global values
 		new global_rank       = ReadPackCell(data);
 		new global_players    = ReadPackCell(data);
+		new global_skill      = ReadPackCell(data);
 		new global_kills      = ReadPackCell(data);
 		new global_deaths     = ReadPackCell(data);
 		new Float: global_kpd = ReadPackFloat(data);
 		new global_headshots  = ReadPackCell(data);
 		new Float: global_hpk = ReadPackFloat(data);
+
+		decl String: player_country_code[2];
+		ReadPackString(data, player_country_code, 2);
 
 		CloseHandle(data);
 
@@ -137,7 +141,7 @@ public QuerygameMEStatsCallback(command, payload, client, &Handle: datapack)
 }
 
 
-public QuerygameMEStatsTop10Callback(command, payload, &Handle: datapack)
+public Action: QuerygameMEStatsTop10Callback(int command, int payload, Handle datapack)
 {
 	if ((command == RAW_MESSAGE_CALLBACK_TOP10)) {
 
@@ -177,7 +181,7 @@ public QuerygameMEStatsTop10Callback(command, payload, &Handle: datapack)
 }
 
 
-public QuerygameMEStatsNextCallback(command, payload, client, &Handle: datapack)
+public Action: QuerygameMEStatsNextCallback(int command, int payload, int client, Handle datapack)
 {
 	if ((client > 0) && (command == RAW_MESSAGE_CALLBACK_NEXT)) {
 
@@ -344,8 +348,6 @@ public onGameMEStatsRank(command, client, String: message_prefix[], &Handle: dat
 
 public onGameMEStatsPublicCommand(command, client, String: message_prefix[], &Handle: datapack)
 {
-	new color_index = -1;
-
 	if ((client > 0) && ((command == RAW_MESSAGE_PLACE) || (command == RAW_MESSAGE_KDEATH) || (command == RAW_MESSAGE_SESSION_DATA))) {
 
 		new Handle: data = CloneHandle(datapack);

@@ -1,7 +1,7 @@
 /**
  * gameME Plugin
  * http://www.gameme.com
- * Copyright (C) 2007-2018 TTS Oetzel & Goerz GmbH
+ * Copyright (C) 2007-2020 TTS Oetzel & Goerz GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,17 +26,17 @@
 
 
 // raw message handling
-#define RAW_MESSAGE_RANK				1
-#define RAW_MESSAGE_PLACE				2
-#define RAW_MESSAGE_KDEATH				3
-#define RAW_MESSAGE_SESSION_DATA		4
-#define RAW_MESSAGE_TOP10				5
-#define RAW_MESSAGE_NEXT				6
+#define RAW_MESSAGE_RANK           1
+#define RAW_MESSAGE_PLACE          2
+#define RAW_MESSAGE_KDEATH         3
+#define RAW_MESSAGE_SESSION_DATA   4
+#define RAW_MESSAGE_TOP10          5
+#define RAW_MESSAGE_NEXT           6
 
 // callbacks
-#define RAW_MESSAGE_CALLBACK_PLAYER		101
-#define RAW_MESSAGE_CALLBACK_TOP10		102
-#define RAW_MESSAGE_CALLBACK_NEXT		103
+#define RAW_MESSAGE_CALLBACK_PLAYER  101
+#define RAW_MESSAGE_CALLBACK_TOP10   102
+#define RAW_MESSAGE_CALLBACK_NEXT    103
 
 
 forward onGameMEStatsRank(command, client, String: message_prefix[], &Handle: datapack);
@@ -44,8 +44,7 @@ forward onGameMEStatsPublicCommand(command, client, String: message_prefix[], &H
 forward onGameMEStatsTop10(command, client, String: message_prefix[], &Handle: datapack);
 forward onGameMEStatsNext(command, client, String: message_prefix[], &Handle: datapack);
 
-
-functag gameMEStatsCallback public(command, payload, client, &Handle: datapack);
+typedef gameMEStatsCallback = function Action(int command, int payload, int client, Handle datapack);
 /**
  * Query gameME Stats data from a client
  * 
@@ -58,8 +57,7 @@ functag gameMEStatsCallback public(command, payload, client, &Handle: datapack);
 native QueryGameMEStats(String: request[], client, gameMEStatsCallback: callback, payload = 0);
 
 
-functag gameMEStatsTop10Callback public(command, payload, &Handle: datapack);
-
+typedef gameMEStatsTop10Callback = function Action(int command, int payload, Handle datapack);
 /**
  * Query Top10 players from gameME Stats
  * 
@@ -72,8 +70,7 @@ functag gameMEStatsTop10Callback public(command, payload, &Handle: datapack);
 native QueryGameMEStatsTop10(String: request[], client, gameMEStatsTop10Callback: callback, payload = 0);
 
 
-functag gameMEStatsNextCallback public(command, payload, client, &Handle: datapack);
-
+typedef gameMEStatsNextCallback = function Action(int command, int payload, int client, Handle datapack);
 /**
  * Query next players from gameME Stats for s specified client
  * 
@@ -85,9 +82,7 @@ functag gameMEStatsNextCallback public(command, payload, client, &Handle: datapa
  */
 native QueryGameMEStatsNext(String: request[], client, gameMEStatsNextCallback: callback, payload = 0);
 
-
-functag gameMEStatsIntCallback public(command, payload, caller[MAXPLAYERS + 1], target[MAXPLAYERS + 1], const String: message_prefix[], const String: message[]);
-
+typedef QuerygameMEStatsIntCallback = function Action(int command, int payload, int caller[MAXPLAYERS + 1], int target[MAXPLAYERS + 1], char[] message_prefix, char[] message);
 /**
  * Query internal (preformatted) gameME Stats data
  * 
@@ -97,7 +92,7 @@ functag gameMEStatsIntCallback public(command, payload, caller[MAXPLAYERS + 1], 
  * @param payload		Payload to distinct queries.
  * @noreturn
  */
-native QueryIntGameMEStats(String: request[], client, gameMEStatsIntCallback: callback, payload = 0, limit = 0);
+native QueryIntGameMEStats(String: request[], client, QuerygameMEStatsIntCallback: callback, payload = 0, limit = 0);
 
 
 /**
