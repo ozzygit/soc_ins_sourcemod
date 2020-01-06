@@ -29,6 +29,23 @@
 				"4"			"3"
 			}
 		}
+		"Bot Numbers"
+		{
+			"cmd" 			"ins_bot_count_checkpoint #1"
+			"admin"			"sm_ban"
+			"execute"		"server"
+			"1"
+			{
+				"type"		"list"
+				"title"		"Bot Numbers:"
+				"1."		"Default"
+				"1"			"0"
+				"2."		"25"
+				"2"			"25"
+				"3."		"30"
+				"3"			"35"
+			}
+		}
 		"Respawn Player"
 		{
 			"cmd"			"sm_respawn #1"
@@ -40,6 +57,6 @@
 					"method"	"name"
 					"title"		"Respawn Player:"
 			}
-		}	
+		}
 	}
 }

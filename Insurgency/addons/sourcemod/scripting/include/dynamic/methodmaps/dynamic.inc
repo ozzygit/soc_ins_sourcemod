@@ -23,10 +23,10 @@ methodmap Dynamic
 	public Dynamic(int blocksize=64, int startsize=0, bool persistent=true)
 #else
 	public Dynamic(int blocksize=64, int startsize=0, bool persistent=false)
-#endif
 	{
 		return Dynamic_Initialise(blocksize, startsize, persistent);
 	}
+#endif
 	
 	public static bool IsLoaded()
 	{
@@ -235,14 +235,14 @@ methodmap Dynamic
 		return Dynamic_SetString(this, membername, value, length);
 	}
 	
-	public bool GetStringByOffset(DynamicOffset offset, char[] buffer, int length)
+	public int GetStringByOffset(DynamicOffset offset, char[] buffer, int length)
 	{
 		return Dynamic_GetStringByOffset(this, offset, buffer, length);
 	}
 	
-	public void SetStringByOffset(const DynamicOffset offset, const char[] value)
+	public void SetStringByOffset(const DynamicOffset offset, const char[] value, int length=0)
 	{
-		Dynamic_SetStringByOffset(this, offset, value);
+		Dynamic_SetStringByOffset(this, offset, value, length);
 	}
 	
 	public int PushString(const char[] value, int length=0, const char[] name="")
@@ -365,9 +365,9 @@ methodmap Dynamic
 		return Dynamic_GetVectorByIndex(this, index, value);
 	}
 	
-	public Function GetFunction(const char[] membername)
+	public Function GetFunction(const char[] membername, Function &value)
 	{
-		return Dynamic_GetFunction(this, membername);
+		return Dynamic_GetFunction(this, membername, value);
 	}
 	
 	public DynamicOffset SetFunction(const char[] membername, Function value)

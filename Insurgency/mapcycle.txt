@@ -7,7 +7,6 @@ baghdad_surge checkpoint
 bastion_coop checkpoint
 block_party_coop_ws checkpoint
 block26_b1 checkpoint
-bridge_coop_ws
 clean_sweep_coop_beta3 checkpoint
 congress_coop checkpoint
 convoy_coopv1 checkpoint
@@ -26,7 +25,7 @@ isis_laststand checkpoint
 jack_hammer_coopv1_2 checkpoint
 jail_break_coop_ws checkpoint
 karbala_dusk checkpoint
-karkar_b11 checkpoint
+karkar_b10 checkpoint
 khanashin_b8 checkpoint
 l4d_ag_b1 checkpoint
 l4d_ga_b2_day checkpoint
