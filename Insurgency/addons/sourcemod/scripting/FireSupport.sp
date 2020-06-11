@@ -18,7 +18,7 @@ public Plugin myinfo = {
 #include <sdktools_trace>
 #include <sdktools_functions>
 #include <timers>
-
+#define TR_GetSurfaceName
 const int TEAM_SPECTATE = 1;
 const int TEAM_SECURITY = 2;
 const int TEAM_INSURGENT = 3;
@@ -231,7 +231,8 @@ public Action Timer_LaunchMissile(Handle timer, DataPack pack) {
 	pos[2] = pack.ReadFloat();
 
 	if (ValidateClient(client)) {
-		SDKCall(fCreateRocket, client, "rocket_rpg7", pos, DOWN_VECTOR);
+		//SDKCall(fCreateRocket, client, "rocket_rpg7", pos, DOWN_VECTOR);
+		SDKCall(fCreateRocket, client, "rocket_firesupport", pos, DOWN_VECTOR);
 		if (shells > 1) {
 			CreateTimer(0.05 + GetURandomFloat(), Timer_LaunchMissile, pack, TIMER_FLAG_NO_MAPCHANGE);
 		}
