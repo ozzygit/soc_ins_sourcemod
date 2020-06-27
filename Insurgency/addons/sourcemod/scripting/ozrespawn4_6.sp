@@ -4752,6 +4752,7 @@ public Action Timer_MedicMonitor(Handle timer, any data)
 	
 	// Search medics
 	for(int medic = 1; medic <= MaxClients; medic++)
+	for(int iClient = 1; iClient <= MaxClients; iClient++)
 	{
 		if (!IsClientInGame(medic) || IsFakeClient(medic)) continue;
 		

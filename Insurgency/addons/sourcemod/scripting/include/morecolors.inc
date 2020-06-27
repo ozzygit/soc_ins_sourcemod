@@ -1,35 +1,42 @@
 // MOAR COLORS
 // By Dr. McKay
 // Inspired by: https://forums.alliedmods.net/showthread.php?t=96831
+
 #if defined _colors_included
-#endinput
+ #endinput
 #endif
 #define _colors_included
+
 #include <regex>
-#define MORE_COLORS_VERSION "1.9.1"
-#define MAX_MESSAGE_LENGTH 256
-#define MAX_BUFFER_LENGTH (MAX_MESSAGE_LENGTH * 4)
-#define COLOR_RED 0xFF4040
-#define COLOR_BLUE 0x99CCFF
-#define COLOR_GRAY 0xCCCCCC
-#define COLOR_GREEN 0x3EFF3E
-#define GAME_DODS 0
+
+#define MORE_COLORS_VERSION		"1.9.1"
+#define MAX_MESSAGE_LENGTH		256
+#define MAX_BUFFER_LENGTH		(MAX_MESSAGE_LENGTH * 4)
+
+#define COLOR_RED				0xFF4040
+#define COLOR_BLUE				0x99CCFF
+#define COLOR_GRAY				0xCCCCCC
+#define COLOR_GREEN				0x3EFF3E
+
+#define GAME_DODS				0
+
 new bool:CSkipList[MAXPLAYERS + 1];
 new Handle:CTrie;
 new CTeamColors[][] = {{0xCCCCCC, 0x4D7942, 0xFF4040}}; // Multi-dimensional array for games that don't support SayText2. First index is the game index (as defined by the GAME_ defines), second index is team. 0 = spectator, 1 = team1, 2 = team2
+
 /**
-* Prints a message to a specific client in the chat area.
-* Supports color tags.
-*
-* @param client Client index.
-* @param message Message (formatting rules).
-* @noreturn
-*
-* On error/Errors: If the client is not connected an error will be thrown.
-*/
+ * Prints a message to a specific client in the chat area.
+ * Supports color tags.
+ * 
+ * @param client		Client index.
+ * @param message		Message (formatting rules).
+ * @noreturn
+ * 
+ * On error/Errors:		If the client is not connected an error will be thrown.
+ */
 stock CPrintToChat(client, const String:message[], any:...) {
-CCheckTrie();
-if(client <= 0 || client > MaxClients) {
+	CCheckTrie();
+	if(client <= 0 || client > MaxClients) {
 		ThrowError("Invalid client index %i", client);
 	}
 	if(!IsClientInGame(client)) {

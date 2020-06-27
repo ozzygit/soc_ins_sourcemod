@@ -5,7 +5,7 @@
 #include <sourcemod>
 #define AUTOLOAD_EXTENSIONS
 #define REQUIRE_EXTENSIONS
-#define PLUGIN_VERSION "0.0.8"
+#define PLUGIN_VERSION "0.0.9"
 #define PLUGIN_DESCRIPTION "Basic reserve slot feature for insurgency"
 
 #define INVALID -200
@@ -64,7 +64,7 @@ public OnPluginStart()
  // s_svVisiblemaxplayers = FindConVar("sv_visiblemaxplayers");
   
   s_smHreservedSlotsEnable = CreateConVar("sm_ins_reserved_slots_enable", "1", "disable/enable reserved slots");
-  //s_smHreservedSlotsAmount = CreateConVar("sm_ins_reserved_slots_amount", "1", "number of reserved slots (do not specify or set to -1 to automatically use hidden slots as reserved)");
+  s_smHreservedSlotsAmount = CreateConVar("sm_ins_reserved_slots_amount", "1", "number of reserved slots (do not specify or set to -1 to automatically use hidden slots as reserved)");
   s_smHreservedAdminProtection = CreateConVar("sm_hreserved_admin_protection", "2", "protect admins from beeing dropped from server by reserved slot access (0: no protection, 1: except spec mode, 2: full protection)");
   s_smHreservedUseImmunity = CreateConVar("sm_hreserved_use_immunity", "1", "use sourcemod immunity level to find a player to be dropped (0: do not use immunity , 1: use immunity level)");
   s_smHreservedImmunityDecrement = CreateConVar("sm_hreserved_immunity_decrement", "1", "value to be subtracted from the immunity level of spectators. The value 0 will make spectators to be treated like players in the game");

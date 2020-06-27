@@ -1,11 +1,7 @@
 /**
  * gameME Plugin
  * http://www.gameme.com
-<<<<<<< HEAD
  * Copyright (C) 2007-2020 TTS Oetzel & Goerz GmbH
-=======
- * Copyright (C) 2007-2014 TTS Oetzel & Goerz GmbH
->>>>>>> parent of 144505b... git overhaul
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

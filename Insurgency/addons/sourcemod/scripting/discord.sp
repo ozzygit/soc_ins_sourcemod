@@ -1,24 +1,3 @@
-/*
- * SourceMod <-> Discord
- * by: shavit
- *
- * This file is part of SourceMod <-> Discord.
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, version 3.0, as published by the
- * Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- To do different servers, rename plugin and build to different configs\configname.cfg file with different webhook URL
-*/
-
 #include <sourcemod>
 #include <dynamic>
 #include <SteamWorks>
@@ -35,8 +14,7 @@ public Plugin myinfo =
 	name = "[INS] Discord",
 	author = "Neko- (shavit)",
 	description = "Relays in-game chat into a Discord channel.",
-	version = "1.0.1",
-	url = "https://github.com/shavitush/smdiscord"
+	version = "1.0.5"
 }
 
 public void OnPluginStart()
@@ -54,6 +32,8 @@ public void OnPluginStart()
 	
 	AddCommandListener(Say_Event, "say");
 	AddCommandListener(SayTeam_Event, "say_team");
+	AddCommandListener(CallVote_Event, "callvote");
+	AddCommandListener(Vote_Event, "vote");
 }
 
 bool LoadConfig(char[] error, int maxlen)
@@ -99,13 +79,17 @@ void EscapeStringAllowAt(char[] string, int maxlen)
 
 public Action:Say_Event(client, const String:cmd[], argc)
 {
+	if(!IsValidClient(client))
+	{
+		return Plugin_Continue;
+	}
+	
 	decl String:strMsg[255];
 	GetCmdArgString(strMsg, 255);
 	StripQuotes(strMsg);
 	
 	decl String:sAuthID[64];
-	//GetClientAuthString(client, sAuthID, 64);
-	GetClientAuthId(client, AuthId_Steam2, sAuthID, sizeof(sAuthID));
+	GetClientAuthId(client, AuthId_Engine, sAuthID, 64);
 	
 	decl String:strName[64];
 	GetClientName(client, strName, sizeof(strName));
@@ -117,13 +101,17 @@ public Action:Say_Event(client, const String:cmd[], argc)
 
 public Action:SayTeam_Event(client, const String:cmd[], argc)
 {
+	if(!IsValidClient(client))
+	{
+		return Plugin_Continue;
+	}
+	
 	decl String:strMsg[255];
 	GetCmdArgString(strMsg, 255);
 	StripQuotes(strMsg);
 	
 	decl String:sAuthID[64];
-	GetClientAuthId(client, AuthId_Steam2, sAuthID, sizeof(sAuthID));
-	//GetClientAuthString(client, sAuthID, 64);
+	GetClientAuthId(client, AuthId_Engine, sAuthID, 64);
 	
 	decl String:strName[64];
 	GetClientName(client, strName, sizeof(strName));
@@ -156,7 +144,13 @@ DiscordMessage(const String:strAuthID[], const String:strName[], const String:st
 		FormatEx(sNewMessage, 1024, "**[%s] %s :** %s", strAuthID, strName, strMessage);
 	}
 	
-	EscapeString(sNewMessage, 1024);
+	if(StrContains(sNewMessage, "@admin") > -1)
+	{
+		ReplaceString(sNewMessage, 1024, "@admin", "<@&572057616340221973>");
+	}
+	
+	EscapeStringAllowAt(sNewMessage, 1024);
+	//EscapeString(sNewMessage, 1024);
 	ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
 	
 	if((!StrEqual(g_szMessageTime, sTime, false)) || (!StrEqual(g_szMessage, sNewMessage, false)))
@@ -188,8 +182,7 @@ public Action:Cmd_CallAdmin(client, args)
 	GetCmdArgString(szReason, sizeof(szReason));
 	
 	decl String:sAuthID[64];
-	//GetClientAuthString(client, sAuthID, 64);
-	GetClientAuthId(client, AuthId_Steam2, sAuthID, sizeof(sAuthID));
+	GetClientAuthId(client, AuthId_Engine, sAuthID, 64);
 	
 	decl String:strName[64];
 	GetClientName(client, strName, sizeof(strName));
@@ -199,7 +192,7 @@ public Action:Cmd_CallAdmin(client, args)
 	FormatEx(sFormat, 1024, "{\"username\":\"%s\", \"content\":\"{msg}\"}", "In-Game Admin Notification");
 	
 	char[] sNewMessage = new char[1024];
-	FormatEx(sNewMessage, 1024, "**[%s] %s** is calling for <@&241224989662117889>```%s```", sAuthID, strName, szReason);
+	FormatEx(sNewMessage, 1024, "**[%s] %s** is calling for <@&572057616340221973>```%s```", sAuthID, strName, szReason);
 	EscapeStringAllowAt(sNewMessage, 1024);
 	ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
 	
@@ -210,4 +203,144 @@ public Action:Cmd_CallAdmin(client, args)
 	
 	PrintToChat(client, "\x0759b0f9[INS] \x01Please wait for the next available admin to reach you...");
 	return Plugin_Handled;
+}
+
+public Action:CallVote_Event(client, const String:cmd[], argc)
+{
+	if(!IsValidClient(client))
+	{
+		return Plugin_Continue;
+	}
+	
+	decl String:strAuthID[64];
+	GetClientAuthId(client, AuthId_Engine, strAuthID, 64);
+	
+	decl String:strName[64];
+	GetClientName(client, strName, sizeof(strName));
+	
+	if(argc == 1)
+	{
+		decl String:Cmd1[64];
+		GetCmdArg(1, Cmd1, sizeof(Cmd1));
+		
+		char[] sNewMessage = new char[1024];
+		FormatEx(sNewMessage, 1024, "**[%s] %s** started a **%s** vote", strAuthID, strName, Cmd1);
+		
+		char[] sFormat = new char[1024];
+		FormatEx(sFormat, 1024, "{\"username\":\"%s\", \"content\":\"{msg}\"}", "In-Game Vote System");
+		
+		ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
+	
+		Handle hRequest = SteamWorks_CreateHTTPRequest(k_EHTTPMethodPOST, gS_WebhookURL);
+		SteamWorks_SetHTTPRequestRawPostBody(hRequest, "application/json", sFormat, strlen(sFormat));
+		SteamWorks_SetHTTPCallbacks(hRequest, view_as<SteamWorksHTTPRequestCompleted>(OnRequestComplete));
+		SteamWorks_SendHTTPRequest(hRequest);
+	}
+	else if(argc == 2)
+	{
+		decl String:Cmd1[64];
+		decl String:Cmd2[64];
+
+		GetCmdArg(1, Cmd1, sizeof(Cmd1));
+		GetCmdArg(2, Cmd2, sizeof(Cmd2));
+		
+		char[] sNewMessage = new char[1024];
+		if(StrContains(Cmd2, " ") > -1)
+		{
+			decl String:strCmd2Info[4][64];
+			ExplodeString(Cmd2, " ", strCmd2Info, sizeof(strCmd2Info), sizeof(strCmd2Info[]));
+			
+			if(GetClientOfUserId(StringToInt(strCmd2Info[0])) != 0)
+			{
+				int nTarget = GetClientOfUserId(StringToInt(strCmd2Info[0]));
+			
+				decl String:sAuthIDTarget[64];
+				GetClientAuthId(nTarget, AuthId_Engine, sAuthIDTarget, 64);
+				
+				decl String:strNameTarget[64];
+				GetClientName(nTarget, strNameTarget, sizeof(strNameTarget));
+			
+				FormatEx(sNewMessage, 1024, "**[%s] %s** started a **%s** vote on **[%s] %s** with reason **%s**", strAuthID, strName, Cmd1, sAuthIDTarget, strNameTarget, strCmd2Info[1]);
+			}
+			else
+			{
+				FormatEx(sNewMessage, 1024, "**[%s] %s** started a **%s** vote, **%s %s**", strAuthID, strName, Cmd1, strCmd2Info[0], strCmd2Info[1]);
+			}
+		}
+		else
+		{
+			FormatEx(sNewMessage, 1024, "**[%s] %s** started a **%s** vote, **%s**", strAuthID, strName, Cmd1, Cmd2);
+		}
+		
+		char[] sFormat = new char[1024];
+		FormatEx(sFormat, 1024, "{\"username\":\"%s\", \"content\":\"{msg}\"}", "In-Game Vote System");
+		
+		ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
+	
+		Handle hRequest = SteamWorks_CreateHTTPRequest(k_EHTTPMethodPOST, gS_WebhookURL);
+		SteamWorks_SetHTTPRequestRawPostBody(hRequest, "application/json", sFormat, strlen(sFormat));
+		SteamWorks_SetHTTPCallbacks(hRequest, view_as<SteamWorksHTTPRequestCompleted>(OnRequestComplete));
+		SteamWorks_SendHTTPRequest(hRequest);
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action:Vote_Event(client, const String:cmd[], argc)
+{
+	if(!IsValidClient(client))
+	{
+		return Plugin_Continue;
+	}
+	
+	if(argc != 1)
+	{
+		return Plugin_Continue;
+	}
+	
+	decl String:Cmd1[64];
+	GetCmdArg(1, Cmd1, sizeof(Cmd1));
+	
+	decl String:strAuthID[64];
+	GetClientAuthId(client, AuthId_Engine, strAuthID, 64);
+	
+	decl String:strName[64];
+	GetClientName(client, strName, sizeof(strName));
+	
+	char[] szOption = new char[32];
+	if(StrContains(Cmd1, "option1") > -1)
+	{
+		FormatEx(szOption, 32, "Yes");
+	}
+	else if(StrContains(Cmd1, "option2") > -1)
+	{
+		FormatEx(szOption, 32, "No");
+	}
+	else
+	{
+		return Plugin_Continue;
+	}
+	
+	char[] sNewMessage = new char[1024];
+	FormatEx(sNewMessage, 1024, "**[%s] %s** voted **%s**", strAuthID, strName, szOption);
+	
+	char[] sFormat = new char[1024];
+	FormatEx(sFormat, 1024, "{\"username\":\"%s\", \"content\":\"{msg}\"}", "In-Game Vote System");
+	
+	ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
+
+	Handle hRequest = SteamWorks_CreateHTTPRequest(k_EHTTPMethodPOST, gS_WebhookURL);
+	SteamWorks_SetHTTPRequestRawPostBody(hRequest, "application/json", sFormat, strlen(sFormat));
+	SteamWorks_SetHTTPCallbacks(hRequest, view_as<SteamWorksHTTPRequestCompleted>(OnRequestComplete));
+	SteamWorks_SendHTTPRequest(hRequest);
+	
+	return Plugin_Continue;
+}
+
+bool:IsValidClient(client) 
+{
+	if ( !( 1 <= client <= MaxClients ) || !IsClientInGame(client) ) 
+		return false; 
+	
+	return true; 
 }

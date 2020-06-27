@@ -409,12 +409,10 @@ stock void AddFolderToDownloadTable(const char[] Directory, bool recursive = fal
  *
  * @return                  If the client is a valid client.
  */
-stock bool IsValidClient(int client) {
-
-	return (client > 0 && client <= MaxClients &&
-		IsClientConnected(client) && IsClientInGame(client) &&
+bool IsValidClient(int client) 
+{
+	return (0 < client <= MaxClients &&	IsClientConnected(client) && IsClientInGame(client) &&
 		!IsClientReplay(client) && !IsClientSourceTV(client));
-
 }
 
 /**

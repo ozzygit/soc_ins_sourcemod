@@ -1,4 +1,0 @@
-This is on linux, but it's similar on windows. Just add everything including and after +exec after the commandline of a shortcut
-You could add it to a batch file also. Plenty of great guides on Steam on how to do this well
-
-srcds_run +exec "pure.cfg" -secure -workshop +map cs_office_coop_b2 checkpoint +maxplayers 49
