@@ -18,7 +18,7 @@ public Plugin myinfo = {
 #include <sdktools_trace>
 #include <sdktools_functions>
 #include <timers>
-
+#define TR_GetSurfaceName
 const int TEAM_SPECTATE = 1;
 const int TEAM_SECURITY = 2;
 const int TEAM_INSURGENT = 3;
@@ -73,17 +73,17 @@ public void OnPluginStart() {
 	}
 
 	gCvarMaxSpread = CreateConVar("sm_firesupport_spread", "800.0", "Max spread.", FCVAR_PROTECTED, true, 10.0);
-	gCvarRound = CreateConVar("sm_firesupport_shell_num", "6.0", "Shells to fire.", FCVAR_PROTECTED, true, 1.0);
-	gCvarDelay = CreateConVar("sm_firesupport_delay", "12.0", "Min delay to first shell.", FCVAR_PROTECTED, true, 1.0);
+	gCvarRound = CreateConVar("sm_firesupport_shell_num", "20.0", "Shells to fire.", FCVAR_PROTECTED, true, 1.0);
+	gCvarDelay = CreateConVar("sm_firesupport_delay", "10.0", "Min delay to first shell.", FCVAR_PROTECTED, true, 1.0);
 	gCvarDelayNextSupport = CreateConVar("sm_firesupport_delay_support", "60.0", "Min delay to next support.", FCVAR_PROTECTED, true, 1.0);
-	gCvarClass = CreateConVar("sm_firesupport_class", "template_combat_medic", "Set fire support specialist class.", FCVAR_PROTECTED);
-	gCvarCountPerRound = CreateConVar("sm_firesupport_count", "0", "Count of available support per rounds(0 = disable)", FCVAR_PROTECTED, true, 0.0);
-	gCvarEnableCmd = CreateConVar("sm_firesupport_enable_cmd", "1", "Player can call fire support using sm_firesupport_call.", FCVAR_PROTECTED);
+	gCvarClass = CreateConVar("sm_firesupport_class", "template_recon_security_coop", "Set fire support specialist class.", FCVAR_PROTECTED);
+	gCvarCountPerRound = CreateConVar("sm_firesupport_count", "1", "Count of available support per rounds(0 = disable)", FCVAR_PROTECTED, true, 0.0);
+	gCvarEnableCmd = CreateConVar("sm_firesupport_enable_cmd", "0", "Player can call fire support using sm_firesupport_call.", FCVAR_PROTECTED);
 	gCvarEnableWeapon = CreateConVar("sm_firesupport_enable_weapon", "1", "Player can call fire support using weapon.", FCVAR_PROTECTED);
 	gCvarWeapon = CreateConVar("sm_firesupport_weapon", "p2a1", "Weapon to call fire support.", FCVAR_PROTECTED);
 
-	RegConsoleCmd("sm_firesupport_call", CmdCallFS, "Call fire support where you looking at.", 1);
-	RegAdminCmd("sm_firesupport_ad_call", CmdCallAFS, 1);										// HINT: test command
+	RegConsoleCmd("sm_firesupport_call", CmdCallFS, "Call fire support where you looking at.", 0);
+	RegAdminCmd("sm_firesupport_ad_call", CmdCallAFS, 0);										// HINT: test command
 
 	HookEvent("weapon_fire", Event_WeaponFire);
 	HookEvent("round_start", Event_RoundStart);
@@ -231,6 +231,7 @@ public Action Timer_LaunchMissile(Handle timer, DataPack pack) {
 	pos[2] = pack.ReadFloat();
 
 	if (ValidateClient(client)) {
+		//SDKCall(fCreateRocket, client, "rocket_rpg7", pos, DOWN_VECTOR);
 		SDKCall(fCreateRocket, client, "rocket_firesupport", pos, DOWN_VECTOR);
 		if (shells > 1) {
 			CreateTimer(0.05 + GetURandomFloat(), Timer_LaunchMissile, pack, TIMER_FLAG_NO_MAPCHANGE);

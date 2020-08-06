@@ -146,7 +146,7 @@ DiscordMessage(const String:strAuthID[], const String:strName[], const String:st
 	
 	if(StrContains(sNewMessage, "@admin") > -1)
 	{
-		ReplaceString(sNewMessage, 1024, "@admin", "<@&572057616340221973>");
+		ReplaceString(sNewMessage, 1024, "@admin", "<@&740207963721039872>");
 	}
 	
 	EscapeStringAllowAt(sNewMessage, 1024);
@@ -192,7 +192,7 @@ public Action:Cmd_CallAdmin(client, args)
 	FormatEx(sFormat, 1024, "{\"username\":\"%s\", \"content\":\"{msg}\"}", "In-Game Admin Notification");
 	
 	char[] sNewMessage = new char[1024];
-	FormatEx(sNewMessage, 1024, "**[%s] %s** is calling for <@&572057616340221973>```%s```", sAuthID, strName, szReason);
+	FormatEx(sNewMessage, 1024, "**[%s] %s** is calling for <@&740207963721039872>```%s```", sAuthID, strName, szReason);
 	EscapeStringAllowAt(sNewMessage, 1024);
 	ReplaceString(sFormat, 1024, "{msg}", sNewMessage);
 	
