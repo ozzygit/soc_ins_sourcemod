@@ -201,6 +201,8 @@ Handle hCvarWarnUnassigned =						INVALID_HANDLE;
 Handle hCvarLogDebug =								INVALID_HANDLE;
 #endif
 
+bool g_HasSpawned[MAXPLAYERS + 1];
+
 // Plugin Information
 public Plugin myinfo =
 {
@@ -675,7 +677,7 @@ int AFK_GetClientCount(bool inGameOnly = true)
 #endif
 
 	int clients = 0;
-	for (int i = 1; i <= GetMaxClients(); i++)	
+	for (int i = 1; i <= MaxClients; i++)	
 		if( ( ( inGameOnly ) ? IsClientInGame(i) : IsClientConnected(i) ) && !IsClientSourceTV(i) && !IsFakeClient(i) )
 			clients++;
 	return clients;
@@ -1304,6 +1306,8 @@ public void OnClientDisconnect_Post(int client) // Client has left server
 
 		CheckMinPlayers();
 	}
+	
+	g_HasSpawned[client] = false;
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -1481,6 +1485,8 @@ public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadc
 								}
 							}
 				}
+				
+				g_HasSpawned[client] = true;
 			}
 	}
 	return Plugin_Continue;
@@ -2020,6 +2026,9 @@ Action MoveAFKClient(int client, bool Advertise=true) // Move AFK Client to Spec
 
 Action KickAFKClient(int client) // Kick AFK Client
 {
+	if (!g_HasSpawned[client] && CheckCommandAccess(client, "", ADMFLAG_ROOT, true))
+		return Plugin_Continue;
+	
 	Action ForwardResult = Forward_OnAFKEvent("afk_kick", client);
 
 	if (ForwardResult != Plugin_Continue)
