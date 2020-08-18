@@ -259,4 +259,10 @@
 		"tr"		"{1} uzun süre AFK olduğu için oyundan atıldı."
 		"no"		"{1} Ble Kastet Ut Fordi Var Ikke Tilstede."
 	}
+
+	"g_sPrefixawn_Move_Warning"
+	{
+		"#format" 	"{1:i}"
+		"en"		"Warning: If you do not move from your spawn position in {1} seconds, you will be moved to spectate."
+	}
 }
