@@ -21,7 +21,7 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <insurgencydy>
-#include <insurgency_ad>
+//#include <insurgency_ad>
 #include <smlib>
 #undef REQUIRE_EXTENSIONS
 #include <cstrike>
