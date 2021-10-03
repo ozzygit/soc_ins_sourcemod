@@ -4,10 +4,10 @@
 #define _insurgencydy_included
 #if defined REQUIRE_PLUGIN
 #undef REQUIRE_PLUGIN
-#include <smlib>
-#define REQUIRE_PLUGIN
-#else
-#include <smlib>
+//#include <smlib>
+//#define REQUIRE_PLUGIN
+//#else
+//#include <smlib>
 #endif
 #define PLUGIN_LOG_PREFIX "INSLIB" //added by CHS
 #define MAX_DEFINABLE_WEAPONS 256
@@ -269,10 +269,9 @@ native int Ins_GetWeaponId(char[] weapon_name);
 
 int StuckCheck[MAXPLAYERS+1] = {0, ...};
 bool isStuck[MAXPLAYERS+1];
-
-float Step;
-float RadiusSize;
-float Ground_Velocity[3] = {0.0, 0.0, -300.0};
+//float Step;
+//float RadiusSize;
+//float Ground_Velocity[3] = {0.0, 0.0, -300.0};
 
 // Team numbers. This is Insurgency specific right now
 // TODO: Add support for DoI style factions, or make it load from a cfg file
@@ -771,6 +770,7 @@ public bool TraceEntityFilterSolid(int entity, int contentsMask) {
 
 
 
+/*
 bool TryFixPosition(int client, float Radius, float pos_Z) {
 	float DegreeAngle;
 	float vecPosition[3];
@@ -803,6 +803,7 @@ bool TryFixPosition(int client, float Radius, float pos_Z) {
 
 	return false;
 }
+*/
 
 
 
